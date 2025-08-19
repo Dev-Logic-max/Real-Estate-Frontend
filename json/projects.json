@@ -1,0 +1,59 @@
+{
+  "projects": [
+    {
+      "id": "1",
+      "title": "Luxury Resort Complex",
+      "description": "Award-winning resort development with 200+ units",
+      "location": "Miami Beach, FL",
+      "images": [
+        { "src": "/placeholder.svg?height=400&width=600", "alt": "Luxury Resort Complex" },
+        { "src": "/placeholder.svg?height=400&width=600", "alt": "Resort amenities" },
+        { "src": "/placeholder.svg?height=400&width=600", "alt": "Resort lobby" }
+      ]
+    },
+    {
+      "id": "2",
+      "title": "Downtown Business Center",
+      "description": "Modern commercial complex in city center",
+      "location": "Downtown Miami, FL",
+      "images": [
+        { "src": "/placeholder.svg?height=400&width=600", "alt": "Downtown Business Center" },
+        { "src": "/placeholder.svg?height=400&width=600", "alt": "Business center lobby" },
+        { "src": "/placeholder.svg?height=400&width=600", "alt": "Office space" }
+      ]
+    },
+    {
+      "id": "3",
+      "title": "Green Valley Residences",
+      "description": "Eco-friendly residential community with 150 homes",
+      "location": "Coral Springs, FL",
+      "images": [
+        { "src": "/placeholder.svg?height=400&width=600", "alt": "Green Valley Residences" },
+        { "src": "/placeholder.svg?height=400&width=600", "alt": "Community park" },
+        { "src": "/placeholder.svg?height=400&width=600", "alt": "Sustainable homes" }
+      ]
+    },
+    {
+      "id": "4",
+      "title": "Marina Bay Towers",
+      "description": "Twin tower luxury condominiums with marina access",
+      "location": "Fort Lauderdale, FL",
+      "images": [
+        { "src": "/placeholder.svg?height=400&width=600", "alt": "Marina Bay Towers" },
+        { "src": "/placeholder.svg?height=400&width=600", "alt": "Marina access" },
+        { "src": "/placeholder.svg?height=400&width=600", "alt": "Condo interior" }
+      ]
+    },
+    {
+      "id": "5",
+      "title": "Tech Hub Plaza",
+      "description": "Mixed-use development with offices and retail",
+      "location": "Brickell, Miami, FL",
+      "images": [
+        { "src": "/placeholder.svg?height=400&width=600", "alt": "Tech Hub Plaza" },
+        { "src": "/placeholder.svg?height=400&width=600", "alt": "Office space" },
+        { "src": "/placeholder.svg?height=400&width=600", "alt": "Retail area" }
+      ]
+    }
+  ]
+}

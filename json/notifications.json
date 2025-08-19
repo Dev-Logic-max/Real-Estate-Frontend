@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "title": "New property match found!",
+    "message": "A 3-bedroom house in Miami matches your criteria",
+    "type": "success",
+    "timestamp": "2024-01-15T10:30:00Z",
+    "read": false
+  },
+  {
+    "id": 2,
+    "title": "Price drop alert",
+    "message": "Luxury apartment in Downtown reduced by $50,000",
+    "type": "warning",
+    "timestamp": "2024-01-15T09:15:00Z",
+    "read": false
+  },
+  {
+    "id": 3,
+    "title": "Tour scheduled",
+    "message": "Your property tour is confirmed for tomorrow at 2 PM",
+    "type": "info",
+    "timestamp": "2024-01-15T08:45:00Z",
+    "read": true
+  },
+  {
+    "id": 4,
+    "title": "New agent message",
+    "message": "Sarah Johnson sent you a message about the property",
+    "type": "info",
+    "timestamp": "2024-01-14T16:20:00Z",
+    "read": false
+  },
+  {
+    "id": 5,
+    "title": "Property approved",
+    "message": "Your property listing has been approved and is now live",
+    "type": "success",
+    "timestamp": "2024-01-14T14:10:00Z",
+    "read": true
+  }
+]

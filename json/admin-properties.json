@@ -1,0 +1,127 @@
+{
+  "properties": [
+    {
+      "id": "1",
+      "title": "Diamond Residency",
+      "price": "$2,500,000",
+      "location": "Downtown Miami, FL",
+      "beds": 4,
+      "baths": 3,
+      "sqft": "2,500 sq ft",
+      "type": "sale",
+      "featured": true,
+      "images": [
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Diamond Residency" },
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Interior view" },
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Balcony view" }
+      ]
+    },
+    {
+      "id": "2",
+      "title": "Presidential Towers",
+      "price": "$1,475,000",
+      "location": "Brickell, Miami, FL",
+      "beds": 3,
+      "baths": 2,
+      "sqft": "1,800 sq ft",
+      "type": "sale",
+      "images": [
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Presidential Towers" },
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Balcony view" },
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Kitchen view" }
+      ]
+    },
+    {
+      "id": "3",
+      "title": "Sheraton And Tribe",
+      "price": "$2,000,000",
+      "location": "South Beach, Miami, FL",
+      "beds": 5,
+      "baths": 4,
+      "sqft": "3,200 sq ft",
+      "type": "rent",
+      "images": [
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Sheraton And Tribe" },
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Beachfront interior" },
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Ocean view" }
+      ]
+    },
+    {
+      "id": "4",
+      "title": "Ocean View Penthouse",
+      "price": "$3,800,000",
+      "location": "Key Biscayne, FL",
+      "beds": 6,
+      "baths": 5,
+      "sqft": "4,500 sq ft",
+      "type": "sale",
+      "featured": true,
+      "images": [
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Ocean View Penthouse" },
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Living room" },
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Terrace view" }
+      ]
+    },
+    {
+      "id": "5",
+      "title": "Modern Loft Downtown",
+      "price": "$1,200,000",
+      "location": "Downtown Miami, FL",
+      "beds": 2,
+      "baths": 2,
+      "sqft": "1,400 sq ft",
+      "type": "sale",
+      "images": [
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Modern Loft Downtown" },
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Loft interior" },
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Bedroom" }
+      ]
+    },
+    {
+      "id": "6",
+      "title": "Waterfront Villa",
+      "price": "$4,200,000",
+      "location": "Coral Gables, FL",
+      "beds": 7,
+      "baths": 6,
+      "sqft": "5,800 sq ft",
+      "type": "sale",
+      "featured": true,
+      "images": [
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Waterfront Villa" },
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Pool area" },
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Interior" }
+      ]
+    },
+    {
+      "id": "7",
+      "title": "City Center Apartment",
+      "price": "$950,000",
+      "location": "Wynwood, Miami, FL",
+      "beds": 2,
+      "baths": 1,
+      "sqft": "1,100 sq ft",
+      "type": "rent",
+      "images": [
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "City Center Apartment" },
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Interior" },
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "City view" }
+      ]
+    },
+    {
+      "id": "8",
+      "title": "Luxury Townhouse",
+      "price": "$2,800,000",
+      "location": "Aventura, FL",
+      "beds": 4,
+      "baths": 3,
+      "sqft": "2,900 sq ft",
+      "type": "sale",
+      "images": [
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Luxury Townhouse" },
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Interior" },
+        { "src": "/placeholder.svg?height=300&width=400", "alt": "Garden" }
+      ]
+    }
+  ]
+}

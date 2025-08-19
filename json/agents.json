@@ -1,0 +1,188 @@
+[
+  {
+    "id": "1",
+    "userId": "user1",
+    "user": {
+      "firstName": "Sarah",
+      "lastName": "Johnson",
+      "email": "sarah.johnson@realestate.com",
+      "phone": "+1 (555) 123-4567",
+      "profilePhotos": ["/placeholder.svg?height=100&width=100"],
+      "address": {
+        "street": "123 Main St",
+        "city": "New York",
+        "state": "NY",
+        "country": "USA",
+        "zipCode": "10001"
+      },
+      "status": "active"
+    },
+    "license": "RE-2024-001",
+    "commissionRate": 2.5,
+    "balance": 15750.0,
+    "bio": "Experienced real estate agent specializing in luxury properties and commercial real estate. Over 8 years of experience in the NYC market.",
+    "documents": ["/placeholder.svg?height=200&width=300"],
+    "status": "approved",
+    "rating": 4.8,
+    "projectCount": 45,
+    "discountRate": 0.5,
+    "specializations": ["Luxury Homes", "Commercial", "Investment Properties"],
+    "totalSales": 2850000,
+    "clientsServed": 127
+  },
+  {
+    "id": "2",
+    "userId": "user2",
+    "user": {
+      "firstName": "Michael",
+      "lastName": "Chen",
+      "email": "michael.chen@realestate.com",
+      "phone": "+1 (555) 987-6543",
+      "profilePhotos": ["/placeholder.svg?height=100&width=100"],
+      "address": {
+        "street": "456 Oak Ave",
+        "city": "Los Angeles",
+        "state": "CA",
+        "country": "USA",
+        "zipCode": "90210"
+      },
+      "status": "active"
+    },
+    "license": "RE-2024-002",
+    "commissionRate": 3.0,
+    "balance": 22100.0,
+    "bio": "Top-performing agent with expertise in residential properties and first-time home buyers. Known for exceptional customer service.",
+    "documents": ["/placeholder.svg?height=200&width=300"],
+    "status": "approved",
+    "rating": 4.9,
+    "projectCount": 62,
+    "discountRate": 0.3,
+    "specializations": ["Residential", "First-Time Buyers", "Condos"],
+    "totalSales": 3200000,
+    "clientsServed": 89
+  },
+  {
+    "id": "3",
+    "userId": "user3",
+    "user": {
+      "firstName": "Emily",
+      "lastName": "Rodriguez",
+      "email": "emily.rodriguez@realestate.com",
+      "phone": "+1 (555) 456-7890",
+      "profilePhotos": ["/placeholder.svg?height=100&width=100"],
+      "address": {
+        "street": "789 Pine St",
+        "city": "Miami",
+        "state": "FL",
+        "country": "USA",
+        "zipCode": "33101"
+      },
+      "status": "active"
+    },
+    "license": "RE-2024-003",
+    "commissionRate": 2.8,
+    "balance": 8950.0,
+    "bio": "Bilingual agent specializing in waterfront properties and vacation homes. Expert in the South Florida market.",
+    "documents": ["/placeholder.svg?height=200&width=300"],
+    "status": "pending",
+    "rating": 4.6,
+    "projectCount": 28,
+    "discountRate": 0.7,
+    "specializations": ["Waterfront", "Vacation Homes", "Luxury Condos"],
+    "totalSales": 1850000,
+    "clientsServed": 54
+  },
+  {
+    "id": "4",
+    "userId": "user4",
+    "user": {
+      "firstName": "David",
+      "lastName": "Thompson",
+      "email": "david.thompson@realestate.com",
+      "phone": "+1 (555) 321-0987",
+      "profilePhotos": ["/placeholder.svg?height=100&width=100"],
+      "address": {
+        "street": "321 Elm Dr",
+        "city": "Chicago",
+        "state": "IL",
+        "country": "USA",
+        "zipCode": "60601"
+      },
+      "status": "active"
+    },
+    "license": "RE-2024-004",
+    "commissionRate": 2.2,
+    "balance": 31200.0,
+    "bio": "Senior agent with 15+ years experience in commercial real estate and property development. Market leader in the Midwest.",
+    "documents": ["/placeholder.svg?height=200&width=300"],
+    "status": "approved",
+    "rating": 4.7,
+    "projectCount": 78,
+    "discountRate": 0.2,
+    "specializations": ["Commercial", "Development", "Industrial"],
+    "totalSales": 5200000,
+    "clientsServed": 156
+  },
+  {
+    "id": "5",
+    "userId": "user5",
+    "user": {
+      "firstName": "Jessica",
+      "lastName": "Williams",
+      "email": "jessica.williams@realestate.com",
+      "phone": "+1 (555) 654-3210",
+      "profilePhotos": ["/placeholder.svg?height=100&width=100"],
+      "address": {
+        "street": "654 Maple Ln",
+        "city": "Austin",
+        "state": "TX",
+        "country": "USA",
+        "zipCode": "73301"
+      },
+      "status": "inactive"
+    },
+    "license": "RE-2024-005",
+    "commissionRate": 2.7,
+    "balance": 5600.0,
+    "bio": "Rising star in residential real estate with a focus on modern homes and tech-savvy clients. Expert in Austin's growing market.",
+    "documents": ["/placeholder.svg?height=200&width=300"],
+    "status": "rejected",
+    "rating": 4.4,
+    "projectCount": 19,
+    "discountRate": 0.8,
+    "specializations": ["Modern Homes", "Tech Properties", "New Construction"],
+    "totalSales": 980000,
+    "clientsServed": 32
+  },
+  {
+    "id": "6",
+    "userId": "user6",
+    "user": {
+      "firstName": "Robert",
+      "lastName": "Davis",
+      "email": "robert.davis@realestate.com",
+      "phone": "+1 (555) 789-0123",
+      "profilePhotos": ["/placeholder.svg?height=100&width=100"],
+      "address": {
+        "street": "987 Cedar St",
+        "city": "Seattle",
+        "state": "WA",
+        "country": "USA",
+        "zipCode": "98101"
+      },
+      "status": "active"
+    },
+    "license": "RE-2024-006",
+    "commissionRate": 3.2,
+    "balance": 18750.0,
+    "bio": "Eco-friendly real estate specialist focusing on sustainable homes and green building practices. Pioneer in environmentally conscious real estate.",
+    "documents": ["/placeholder.svg?height=200&width=300"],
+    "status": "approved",
+    "rating": 4.9,
+    "projectCount": 41,
+    "discountRate": 0.4,
+    "specializations": ["Eco-Friendly", "Sustainable Homes", "Green Building"],
+    "totalSales": 2100000,
+    "clientsServed": 73
+  }
+]

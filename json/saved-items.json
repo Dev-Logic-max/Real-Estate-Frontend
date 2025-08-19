@@ -1,0 +1,40 @@
+{
+  "properties": [
+    {
+      "id": 1,
+      "title": "Luxury Villa in Miami Beach",
+      "price": 2500000,
+      "location": "Miami Beach, FL",
+      "image": "/placeholder.svg?height=200&width=300",
+      "type": "sale",
+      "bedrooms": 5,
+      "bathrooms": 4,
+      "area": 4500,
+      "savedAt": "2024-01-15T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "title": "Modern Downtown Apartment",
+      "price": 3500,
+      "location": "Downtown Miami, FL",
+      "image": "/placeholder.svg?height=200&width=300",
+      "type": "rent",
+      "bedrooms": 2,
+      "bathrooms": 2,
+      "area": 1200,
+      "savedAt": "2024-01-14T15:30:00Z"
+    }
+  ],
+  "agents": [
+    {
+      "id": 1,
+      "name": "Sarah Johnson",
+      "title": "Senior Real Estate Agent",
+      "image": "/placeholder.svg?height=100&width=100",
+      "rating": 4.9,
+      "properties": 156,
+      "experience": "8 years",
+      "savedAt": "2024-01-15T09:00:00Z"
+    }
+  ]
+}
