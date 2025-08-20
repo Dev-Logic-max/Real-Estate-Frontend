@@ -92,9 +92,8 @@ export default function AddUserModal({ isOpen, onClose, onAdd }: AddUserModalPro
         }
         console.log("Agent Payload", agentPayload)
         await agentApi.createAgent(newUserId, agentPayload) 
+        toast.success("Agent created successfully")
       }
-
-      toast.success("Agent created successfully")
 
       setFormData({
         email: "",

@@ -343,7 +343,7 @@ export default function PropertiesPage() {
                                                 <Button
                                                     size="sm"
                                                     variant="ghost"
-                                                    className="text-blue-500 hover:text-blue-600 hover:bg-blue-100 transition-all duration-200"
+                                                    className="text-blue-500 hover:text-blue-600 hover:bg-blue-100 transition-all duration-200 border border-blue-200 hover:border-blue-400 shadow-sm"
                                                     onClick={() => handleViewProperty(property)}
                                                 >
                                                     <FaEye className="w-4 h-4" />
@@ -351,7 +351,7 @@ export default function PropertiesPage() {
                                                 <Button
                                                     size="sm"
                                                     variant="ghost"
-                                                    className="text-green-500 hover:text-green-600 hover:bg-green-100 transition-all duration-200"
+                                                    className="text-green-500 hover:text-green-600 hover:bg-green-100 transition-all duration-200 border border-green-200 hover:border-green-400 shadow-sm"
                                                     onClick={() => handleEditProperty(property)}
                                                 >
                                                     <FaEdit className="w-4 h-4" />
@@ -359,7 +359,7 @@ export default function PropertiesPage() {
                                                 <Button
                                                     size="sm"
                                                     variant="ghost"
-                                                    className="text-red-500 hover:text-red-600 hover:bg-red-100 transition-all duration-200"
+                                                    className="text-red-500 hover:text-red-600 hover:bg-red-100 transition-all duration-200 border border-red-200 hover:border-red-400 shadow-sm"
                                                     onClick={() => handleDeleteProperty(property)}
                                                 >
                                                     <FaTrash className="w-4 h-4" />

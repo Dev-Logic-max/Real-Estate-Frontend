@@ -8,8 +8,10 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import AutoImageSlider from "@/components/common/AutoImageSlider"
 import { FaGoogle, FaApple, FaEye, FaEyeSlash, FaHome } from "react-icons/fa"
+import { useAuth } from "@/hooks/useAuth"
 
 export default function RegisterPage() {
+  const { register, loading } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [formData, setFormData] = useState({
@@ -28,6 +30,23 @@ export default function RegisterPage() {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (formData.password !== formData.confirmPassword) {
+      return alert("Passwords do not match")
+    }
+    try {
+      await register({
+        email: formData.email,
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+      })
+    } catch (error) {
+      // Error handled by useAuth
+    }
   }
 
   return (
@@ -68,7 +87,7 @@ export default function RegisterPage() {
           </div>
 
           {/* Register form */}
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="firstName" className="text-gray-700 font-medium">
@@ -172,8 +191,8 @@ export default function RegisterPage() {
               </Label>
             </div>
 
-            <Button className="w-full h-12 gradient-success text-white hover:opacity-90 transition-all duration-300 shadow-gradient">
-              Create Account
+            <Button type="submit" disabled={loading} className="w-full h-12 gradient-success text-white hover:opacity-90 transition-all duration-300 shadow-gradient">
+              {loading ? "Creating Account..." : "Create Account"}
             </Button>
 
             <div className="text-center">

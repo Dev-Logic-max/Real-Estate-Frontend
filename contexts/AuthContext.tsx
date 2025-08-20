@@ -85,20 +85,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const verifyToken = async () => {
     try {
+      // setLoading(true);
       const response = await authApi.verify();
-      const { user: userData } = response.data;
-      const storedUser = {
-        id: userData._id,
-        username: `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
-        roles: userData.roles,
-      };
-      setUser(storedUser);
-      localStorage.setItem('user', JSON.stringify(storedUser)); // Refresh storage
+      console.log('Verify response:', response.data); // Debug the response
+      const { user: userData, valid } = response.data;
+      if (valid && userData) {
+        const token = localStorage.getItem('token') || '';
+        saveToStorage(token, userData); // Full 'User' data from backend response
+      } else {
+        throw new Error('Token validation failed');
+      }
     } catch (error) {
+      toast.error("Verification Failed")
+      console.error('Token verification error:', error);
       // localStorage.removeItem('token');
       // localStorage.removeItem('user');
-      setUser(null);
+      // setUser(null);
       router.push('/auth/login');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -109,9 +114,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         const parsedUser = JSON.parse(cachedUser);
         setUser(parsedUser);
-        verifyToken(); // Validate token
+        verifyToken(); // Validate and refresh token
       } catch (error) {
-        setUser(null);
+        // localStorage.removeItem('token');
+        // localStorage.removeItem('user');
+        // setUser(null);
         toast.error('Failed to load user data');
       }
     } else {

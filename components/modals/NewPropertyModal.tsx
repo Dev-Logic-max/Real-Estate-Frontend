@@ -647,23 +647,6 @@ export default function AddPropertyModal({ isOpen, onClose, onAdd }: AddProperty
           </div>
 
           {/* Amenities */}
-          {/* <div className="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-blue-200">
-            <h3 className="text-lg font-semibold text-blue-800 mb-4">Amenities</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-              {commonAmenities.map((amenity) => (
-                <label key={amenity} className="flex items-center space-x-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.amenities.includes(amenity)}
-                    onChange={() => handleAmenitiesChange(amenity)}
-                    className="rounded border-blue-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-blue-700">{amenity}</span>
-                </label>
-              ))}
-            </div>
-          </div> */}
-
           <div className="bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-blue-200">
             <h3 className="text-lg font-semibold text-blue-800 mb-4">Amenities</h3>
             <div className="space-y-4">
@@ -683,21 +666,15 @@ export default function AddPropertyModal({ isOpen, onClose, onAdd }: AddProperty
                   <SelectValue placeholder="Select or search amenities..." />
                 </SelectTrigger>
                 <SelectContent className="bg-white max-h-60 overflow-auto">
-                  {commonAmenities
-                    .filter((amenity) =>
-                      amenity.toLowerCase().includes(
-                        (document.activeElement as HTMLInputElement)?.value?.toLowerCase() || ""
-                      )
-                    )
-                    .map((amenity) => (
-                      <SelectItem
-                        key={amenity}
-                        value={amenity}
-                        className="hover:bg-amber-50"
-                      >
-                        {amenity}
-                      </SelectItem>
-                    ))}
+                  {commonAmenities.map((amenity) => (
+                    <SelectItem
+                      key={amenity}
+                      value={amenity}
+                      className="hover:bg-amber-50"
+                    >
+                      {amenity}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 

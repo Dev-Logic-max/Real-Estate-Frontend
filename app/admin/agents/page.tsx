@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { useEffect, useState } from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -29,6 +29,10 @@ import agentsData from "@/json/agents.json"
 import EditAgentModal from "@/components/modals/AgentEditModal"
 import DeleteAgentModal from "@/components/modals/AgentDeleteModal"
 import AddAgentModal from "@/components/modals/NewAgentModal"
+import { toast } from "react-toastify"
+import { agentApi } from "@/lib/api/agent"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { FaCalendarAlt, FaCheck, FaCog, FaIdCard, FaPhone, FaTimes, FaToggleOn, FaUser } from "react-icons/fa"
 
 export default function AgentsPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -38,6 +42,46 @@ export default function AgentsPage() {
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [addModalOpen, setAddModalOpen] = useState(false)
+
+  const [loading, setLoading] = useState(false)
+
+  const [pendingRequests, setPendingRequests] = useState<any[]>([])
+
+  useEffect(() => {
+    const fetchPendingRequests = async () => {
+      try {
+        const response = await agentApi.getPendingRequests()
+        console.log("Response", response)
+        setPendingRequests(Array.isArray(response.data) ? response.data : [])
+        // setPendingRequests(response.data || [])
+      } catch (error) {
+        toast.error("Failed to fetch pending requests")
+      }
+    }
+    fetchPendingRequests()
+  }, [])
+
+  console.log("Setting", pendingRequests);
+
+  const handleApprove = async (id: string) => {
+    try {
+      await agentApi.approveAgent(id)
+      toast.success("Agent approved successfully")
+      setPendingRequests(pendingRequests.filter((req) => req._id !== id))
+    } catch (error) {
+      toast.error("Failed to approve agent")
+    }
+  }
+
+  const handleReject = async (id: string) => {
+    try {
+      await agentApi.rejectAgent(id)
+      toast.success("Agent rejected successfully")
+      setPendingRequests(pendingRequests.filter((req) => req._id !== id))
+    } catch (error) {
+      toast.error("Failed to reject agent")
+    }
+  }
 
   const itemsPerPage = 6
 
@@ -109,6 +153,127 @@ export default function AgentsPage() {
           Add New Agent
         </Button>
       </div>
+
+      {/* Pending Agent Requests Table */}
+      <Card className="shadow-lg pt-0 overflow-hidden">
+        <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-blue-100 gap-0 pt-4 pb-4">
+          <CardTitle className="gradient-text text-blue-900">Pending Agent Requests ({pendingRequests.length})</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0 m-4 rounded-md overflow-hidden">
+          <Table>
+            <TableHeader className="bg-gradient-to-r from-blue-100 to-purple-100">
+              <TableRow className="border-blue-200">
+                <TableHead className="font-semibold text-blue-900">
+                  <div className="flex items-center ps-6 gap-2">
+                    <FaUser className="text-blue-600" />
+                    Agent
+                  </div>
+                </TableHead>
+                <TableHead className="font-semibold text-blue-900">
+                  <div className="flex items-center gap-2">
+                    <FaIdCard className="text-purple-600" />
+                    License
+                  </div>
+                </TableHead>
+                <TableHead className="font-semibold text-blue-900">
+                  <div className="flex items-center gap-2">
+                    <FaPhone className="text-green-600" />
+                    Phone
+                  </div>
+                </TableHead>
+                <TableHead className="font-semibold text-blue-900">
+                  <div className="flex items-center gap-2">
+                    <FaCalendarAlt className="text-orange-600" />
+                    Submitted
+                  </div>
+                </TableHead>
+                <TableHead className="font-semibold text-blue-900">
+                  <div className="flex items-center gap-2">
+                    <FaToggleOn className="text-emerald-600" />
+                    Status
+                  </div>
+                </TableHead>
+                <TableHead className="font-semibold text-blue-900">
+                  <div className="flex items-center justify-center gap-2">
+                    <FaCog className="text-red-600" />
+                    Actions
+                  </div>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-gray-600">
+                    Loading agent requests...
+                  </TableCell>
+                </TableRow>
+              ) : pendingRequests.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-gray-600">
+                    No pending requests at the moment
+                  </TableCell>
+                </TableRow>
+              ) : (
+                pendingRequests.map((request) => (
+                  <TableRow
+                    key={request._id}
+                    className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 border-blue-100"
+                  >
+                    <TableCell>
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium border border-blue-400 text-gray-600 bg-gradient-to-b from-purple-200 to-blue-400">
+                          {`${request.userId?.slice(0, 1) || 'N/A'}`.toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="font-medium">{request.userId || 'N/A'}</div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm text-gray-600">{request.license || 'N/A'}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm text-gray-600">{request.phone || 'N/A'}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <FaCalendarAlt className="text-orange-500" />
+                        {new Date(request.createdAt).toLocaleDateString()}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={`${getStatusStyles(request.status)} font-medium px-3 py-1 rounded-full`}>
+                        {request.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex justify-center space-x-2">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => handleApprove(request._id)}
+                          className="text-green-500 hover:bg-green-100 hover:text-green-700 rounded-full transition-all duration-200"
+                        >
+                          <FaCheck />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => handleReject(request._id)}
+                          className="text-red-500 hover:bg-red-100 hover:text-red-700 rounded-full transition-all duration-200"
+                        >
+                          <FaTimes />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100">

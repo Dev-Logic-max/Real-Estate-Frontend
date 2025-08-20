@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -22,6 +22,7 @@ import {
     FaCog,
     FaChevronLeft,
     FaChevronRight,
+    FaClock,
 } from "react-icons/fa"
 import UserViewModal from "@/components/modals/UserViewModal"
 import UserEditModal from "@/components/modals/UserEditModal"
@@ -31,6 +32,7 @@ import { AddUser, RoleEnum, User } from "@/types"
 import { userApi } from "@/lib/api/user"
 import { toast } from "react-toastify"
 import { MdArrowDropDown } from "react-icons/md"
+import { FcCalendar, FcClock, FcPlanner, FcSynchronize } from "react-icons/fc";
 
 export default function UsersPage() {
     const [searchTerm, setSearchTerm] = useState("")
@@ -42,6 +44,7 @@ export default function UsersPage() {
     const [addModalOpen, setAddModalOpen] = useState(false)
     const [users, setUsers] = useState<User[]>([])
     const [loading, setLoading] = useState(true)
+    const syncRef = useRef<HTMLElement>(null);
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 10
 
@@ -53,19 +56,34 @@ export default function UsersPage() {
         [RoleEnum.Agent]: "Agent",
     }
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                setLoading(true)
-                const response = await userApi.usersList()
-                setUsers(response.data.users)
-            } catch (error) {
-                toast.error("Failed to fetch users")
-            } finally {
-                setLoading(false)
-            }
+    const fetchUsers = async () => {
+        try {
+            setLoading(true)
+            const response = await userApi.usersList()
+            setUsers(response.data.users)
+        } catch (error) {
+            toast.error("Failed to fetch users")
+        } finally {
+            setLoading(false)
         }
+    }
+
+    useEffect(() => {
         fetchUsers()
+
+        if (syncRef.current) {
+            syncRef.current.addEventListener('animationend', () => {
+                syncRef.current!.style.transform = 'rotate(0deg)';
+            });
+        }
+
+        return () => {
+            if (syncRef.current) {
+                syncRef.current.removeEventListener("animationend", () => {
+                    syncRef.current!.style.transform = "rotate(0deg)";
+                });
+            }
+        };
     }, [])
 
     const getRoleStyles = (role: string) => {
@@ -224,8 +242,22 @@ export default function UsersPage() {
 
             {/* Users Table */}
             <Card className="shadow-lg pt-0 overflow-hidden">
-                <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-blue-100 gap-0 pt-4 pb-4">
+                <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-blue-100 relative gap-0 pt-4 pb-4">
                     <CardTitle className="gradient-text text-blue-900">All Users ({filteredUsers.length})</CardTitle>
+                    <div
+                        ref={syncRef as any}
+                        className="w-6 h-6 absolute top-4 right-6 p-1 bg-blue-100 rounded-sm hover:scale-125 cursor-pointer"
+                        onClick={async () => {
+                            if (syncRef.current) {
+                                syncRef.current.style.transition = "transform 1s";
+                                syncRef.current.style.transform = "rotate(360deg)";
+                                await fetchUsers(); // Call the external function
+                                toast.success("Users refreshed successfully");
+                            }
+                        }}
+                    >
+                        <FcSynchronize className="w-full h-full" />
+                    </div>
                 </CardHeader>
                 <CardContent className="p-0 m-4 rounded-md overflow-hidden">
                     <Table>
@@ -251,8 +283,14 @@ export default function UsersPage() {
                                 </TableHead>
                                 <TableHead className="font-semibold text-blue-900">
                                     <div className="flex items-center gap-2">
-                                        <FaCalendarAlt className="text-orange-600" />
+                                        <FcCalendar className="w-4 h-4" />
                                         Joined
+                                    </div>
+                                </TableHead>
+                                <TableHead className="font-semibold text-blue-900">
+                                    <div className="flex items-center gap-2">
+                                        <FcClock className="w-4 h-4" />
+                                        Time
                                     </div>
                                 </TableHead>
                                 <TableHead className="font-semibold text-blue-900">
@@ -343,8 +381,15 @@ export default function UsersPage() {
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                <FaCalendarAlt className="text-orange-500" />
+                                                <FcCalendar className="w-4 h-4" />
+                                                {/* <FcPlanner className="w-4 h-4"/> */}
                                                 {user.joinDate}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell>
+                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                <FcClock className="w-4 h-4" />
+                                                {user.createdAt ? new Date(user.createdAt).toLocaleTimeString() : 'N/A'}
                                             </div>
                                         </TableCell>
                                         <TableCell>
