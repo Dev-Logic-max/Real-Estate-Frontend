@@ -32,7 +32,7 @@ import AddAgentModal from "@/components/modals/NewAgentModal"
 import { toast } from "react-toastify"
 import { agentApi } from "@/lib/api/agent"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { FaCalendarAlt, FaCheck, FaCog, FaIdCard, FaPhone, FaTimes, FaToggleOn, FaUser } from "react-icons/fa"
+import { FaCalendarAlt, FaCheck, FaCog, FaEye, FaIdCard, FaPhone, FaTimes, FaToggleOn, FaUser } from "react-icons/fa"
 
 export default function AgentsPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -264,6 +264,14 @@ export default function AgentsPage() {
                           className="text-red-500 hover:bg-red-100 hover:text-red-700 rounded-full transition-all duration-200"
                         >
                           <FaTimes />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          // onClick={() => handleView(request._id)}
+                          className="text-blue-500 hover:bg-blue-100 hover:text-blue-700 rounded-full transition-all duration-200"
+                        >
+                          <FaEye />
                         </Button>
                       </div>
                     </TableCell>

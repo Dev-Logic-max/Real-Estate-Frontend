@@ -277,7 +277,6 @@ export default function PropertyViewModal({ property, isOpen, onClose }: Propert
                         <div>
                           {/* <p className="font-medium">{agent.name}</p> */}
                           <p className="text-sm text-gray-600">{agent.commissionRate}% commission</p>
-                          <p className="text-sm text-gray-500">{agent.terms}</p>
                         </div>
                         <Badge className={getStatusColor(agent.status)}>{agent.status}</Badge>
                       </div>

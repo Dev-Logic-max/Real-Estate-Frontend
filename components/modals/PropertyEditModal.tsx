@@ -19,6 +19,17 @@ import { Property } from "@/types"
 import AutoImageSlider from "../common/AutoImageSlider"
 import { toast } from "react-toastify"
 import { propertyApi } from "@/lib/api/property"
+import { agentApi } from "@/lib/api/agent"
+
+interface AgentOption {
+  userId: string
+  firstName: string
+  lastName: string
+  status: string
+  phone?: string
+  commissionRate: number
+  profilePhotos: string[]
+}
 
 interface PropertyEditModalProps {
   property: Property | null
@@ -28,6 +39,8 @@ interface PropertyEditModalProps {
 }
 
 export default function PropertyEditModal({ property, isOpen, onClose, onSave }: PropertyEditModalProps) {
+  const [approvedAgents, setApprovedAgents] = useState<AgentOption[]>([])
+  const [searchTerm, setSearchTerm] = useState("")
   const [previewImage, setPreviewImage] = useState<string | null>(null) // For previewing uploaded image
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [newAmenity, setNewAmenity] = useState("")
@@ -61,6 +74,28 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
     rentPeriod: "",
     agents: [],
   })
+
+  useEffect(() => {
+    const fetchApprovedAgents = async () => {
+      try {
+        const response = await agentApi.getApprovedAgents()
+        console.log("Response of approved agents", response)
+        const agents = response.data.map((item: any) => ({
+          userId: item.user._id,
+          status: item.agent.status,
+          firstName: item.user.firstName,
+          lastName: item.user.lastName,
+          phone: item.agent.phone,
+          commissionRate: item.agent.commissionRate,
+          profilePhotos: item.user.profilePhotos,
+        }))
+        setApprovedAgents(agents)
+      } catch (error) {
+        toast.error("Failed to fectch approved agents")
+      }
+    }
+    fetchApprovedAgents()
+  }, [])
 
   // Sync formData with property prop when it changes
   useEffect(() => {
@@ -189,6 +224,35 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
     }))
   }
 
+  const handleAddAgent = (userId: string) => {
+    const selectedAgent = approvedAgents.find(agent => agent.userId === userId)
+    console.log("Selected Agent", selectedAgent)
+    if (selectedAgent && !formData.agents?.some(agent => agent.agentId === userId)) {
+      setFormData((prev: any) => ({
+        ...prev,
+        agents: [
+          ...(prev.agents || []),
+          {
+            agentId: selectedAgent.userId,
+            status: selectedAgent.status,
+            phone: selectedAgent.phone,
+            commissionRate: selectedAgent.commissionRate,
+            firstName: selectedAgent.firstName,
+            lastName: selectedAgent.lastName,
+            // profilePhotos: selectedAgent.profilePhotos[0],
+          },
+        ],
+      }))
+    }
+  }
+
+  const handleRemoveAgent = (userId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      agents: prev.agents?.filter(agent => agent.agentId !== userId) || [],
+    }))
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // console.log("Submitting formData before save:", formData) // Debug log before save
@@ -201,6 +265,11 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
   }
 
   if (!isOpen) return null
+
+  // Filter agents based on search term
+  const filteredAgents = approvedAgents.filter(agent =>
+    `${agent.firstName} ${agent.lastName}`.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -540,6 +609,93 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
                 onChange={(e) => handleInputChange("availableFrom", e.target.value)}
                 placeholder="Select available date"
               />
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Agents */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900">Assigned Agents</h3>
+            <div className="space-y-2">
+              <Label htmlFor="agentSearch">Search and Add Agent</Label>
+              <Select onValueChange={handleAddAgent} value="">
+                <SelectTrigger className="w-full">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      placeholder="Search agents..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="flex-1 border-none focus:ring-0 p-0"
+                    />
+                  </div>
+                </SelectTrigger>
+                <SelectContent className="max-h-60 overflow-auto">
+                  {filteredAgents.map((agent) => {
+                    const initials = `${agent.firstName.charAt(0)}${agent.lastName.charAt(0)}`
+                    const displayImage = agent.profilePhotos.length > 0
+                      ? `${process.env.NEXT_PUBLIC_PICTURES_URL}${agent.profilePhotos[0]}`
+                      : undefined
+
+                    return (
+                      <SelectItem key={agent.userId} value={agent.userId} className="flex items-center gap-2 p-2 hover:bg-gray-100">
+                        {displayImage ? (
+                          <img
+                            src={displayImage}
+                            alt={`${agent.firstName} ${agent.lastName}`}
+                            className="w-8 h-8 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-white font-bold">
+                            {initials}
+                          </div>
+                        )}
+                        <div>
+                          <p className="font-medium">{`${agent.firstName} ${agent.lastName}`}</p>
+                          <p className="text-sm text-gray-500">{`Commission: ${agent.commissionRate}%`}</p>
+                        </div>
+                      </SelectItem>
+                    )
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {formData.agents?.map((agent) => {
+                const matchedAgent = approvedAgents.find(a => a.userId === agent.agentId)
+                if (!matchedAgent) return null
+                const initials = `${matchedAgent.firstName.charAt(0)}${matchedAgent.lastName.charAt(0)}`
+                const displayImage = matchedAgent.profilePhotos.length > 0
+                  ? `${process.env.NEXT_PUBLIC_PICTURES_URL}${matchedAgent.profilePhotos[0]}`
+                  : undefined
+
+                return (
+                  <Badge
+                    key={agent.agentId}
+                    variant="outline"
+                    className="px-3 py-2 gap-2 bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 hover:border-blue-400 hover:text-blue-800 transition-all"
+                  >
+                    {displayImage ? (
+                      <img
+                        src={displayImage}
+                        alt={`${matchedAgent.firstName} ${matchedAgent.lastName}`}
+                        className="w-5 h-5 rounded-full object-cover mr-1"
+                      />
+                    ) : (
+                      <div className="w-5 h-5 rounded-full bg-gray-300 flex items-center justify-center text-white text-xs font-bold mr-1">
+                        {initials}
+                      </div>
+                    )}
+                    <span>{`${matchedAgent.firstName} ${matchedAgent.lastName}`}</span>
+                    <span
+                      className="cursor-pointer text-red-300 hover:text-red-600 ml-2"
+                      onClick={() => handleRemoveAgent(agent.agentId)}
+                    >
+                      <FaTrash className="text-sm" />
+                    </span>
+                  </Badge>
+                )
+              })}
             </div>
           </div>
 

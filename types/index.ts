@@ -69,9 +69,13 @@ export interface Property {
     ownerId: string;
     agents?: {
         agentId: string;
+        firstName: string;
+        lastName?: string;
         commissionRate: number;
-        terms: string;
+        terms?: string;
         status: 'pending' | 'accepted' | 'rejected';
+        phone?: string;
+        profilePhotos?: string[];
     }[];
     amenities?: string[];
     contactName?: string;
@@ -110,9 +114,13 @@ export interface AddProperty {
     ownerId: string;
     agents?: {
         agentId: string;
+        firstName: string;
+        lastName?: string;
         commissionRate: number;
-        terms: string;
+        terms?: string;
+        phone?: string;
         status: 'pending' | 'accepted' | 'rejected';
+        profilePhotos?: string[];
     }[];
     amenities?: string[];
     contactName?: string;

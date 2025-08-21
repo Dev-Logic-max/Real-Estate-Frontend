@@ -9,7 +9,7 @@ export const agentApi = {
     approveAgent: (id: string) => client.post<{ message: string }>(`/agent/${id}/approve`),
     rejectAgent: (id: string) => client.post<{ message: string }>(`/agent/${id}/reject`),
 
-    getAgents: () => client.get<{ message: string; agents: any[] }>('/agent'),
+    getApprovedAgents: () => client.get<{ message: string; agents: any }>('/agent'),
     getPendingRequests: () => client.get<{ message: string; agents: any[] }>('/agent/requests'),
     uploadDocument: (file: File) => {
         const formData = new FormData();

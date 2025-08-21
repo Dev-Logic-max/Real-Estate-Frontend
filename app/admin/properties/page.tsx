@@ -22,6 +22,7 @@ import { AddProperty, Property } from "@/types"
 import { toast } from "react-toastify"
 import { FaSearch, FaPlus, FaEye, FaEdit, FaTrash, FaHome, FaBuilding, FaBed, FaBath, FaRulerCombined, FaMapMarkerAlt, FaUser, FaPhone, FaEnvelope } from "react-icons/fa"
 import { PiBathtub, PiBed, PiBuildingApartmentDuotone, PiBuildingDuotone, PiBuildingOfficeDuotone, PiBuildingsDuotone, PiEnvelope, PiEyeBold, PiHouseLineDuotone, PiMapPin, PiMapPinLine, PiPencilSimpleBold, PiPhoneCall, PiRuler, PiTrashBold, PiUserCircle } from "react-icons/pi"
+import { agentApi } from "@/lib/api/agent"
 
 export default function PropertiesPage() {
     const [layout, setLayout] = useState("grid")
@@ -80,13 +81,13 @@ export default function PropertiesPage() {
     const getTypeIcon = (propertyType: string) => {
         switch (propertyType) {
             case "villa":
-                return <PiBuildingOfficeDuotone className="w-6 h-6 text-cyan-500"/>
+                return <PiBuildingOfficeDuotone className="w-6 h-6 text-cyan-500" />
             case "house":
                 return <PiHouseLineDuotone className="w-6 h-6 text-blue-500" />
             case "apartment":
                 return <PiBuildingApartmentDuotone className="w-6 h-6 text-green-500" />
             case "penthouse":
-                return <PiBuildingDuotone className="w-6 h-6 text-orange-500"/>
+                return <PiBuildingDuotone className="w-6 h-6 text-orange-500" />
             case "cottage":
                 return <PiBuildingsDuotone className="w-6 h-6 text-purple-500" />
             default:
