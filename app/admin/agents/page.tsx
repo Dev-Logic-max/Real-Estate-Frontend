@@ -32,7 +32,9 @@ import AddAgentModal from "@/components/modals/NewAgentModal"
 import { toast } from "react-toastify"
 import { agentApi } from "@/lib/api/agent"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { FaCalendarAlt, FaCheck, FaCog, FaIdCard, FaPhone, FaTimes, FaToggleOn, FaUser } from "react-icons/fa"
+import { FaCalendarAlt, FaCheck, FaCog, FaEye, FaIdCard, FaPhone, FaTimes, FaToggleOn, FaUser } from "react-icons/fa"
+import { NotificationApi } from "@/lib/api/notification"
+import { RoleEnum } from "@/types/auth"
 
 export default function AgentsPage() {
   const [searchTerm, setSearchTerm] = useState("")
@@ -48,6 +50,9 @@ export default function AgentsPage() {
   const [pendingRequests, setPendingRequests] = useState<any[]>([])
 
   useEffect(() => {
+
+
+
     const fetchPendingRequests = async () => {
       try {
         const response = await agentApi.getPendingRequests()
@@ -59,6 +64,7 @@ export default function AgentsPage() {
       }
     }
     fetchPendingRequests()
+    
   }, [])
 
   console.log("Setting", pendingRequests);
@@ -134,6 +140,12 @@ export default function AgentsPage() {
       maximumFractionDigits: 0,
     }).format(amount)
   }
+
+
+
+
+
+
 
   return (
     <div className="p-6 space-y-6">

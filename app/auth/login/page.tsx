@@ -26,6 +26,7 @@ export default function LoginPage() {
     e.preventDefault()
     try {
       await login({ email, password })
+      
       // Success toast and redirect handled by useAuth
     } catch (error) {
       // Error toast handled by authApi interceptor

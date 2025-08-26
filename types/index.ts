@@ -6,6 +6,13 @@ export enum RoleEnum {
     Agent = 5,
     Investor = 6,
 }
+export enum NotificationPurposeEnum {
+  USER_REGISTRATION = "USER_REGISTRATION",
+  PASSWORD_RESET = "PASSWORD_RESET",
+  PROPERTY_UPDATE = "PROPERTY_UPDATE",
+  NEW_MESSAGE = "NEW_MESSAGE",
+  TRANSACTION_ALERT = "TRANSACTION_ALERT",
+}
 
 export enum StatusEnum {
     Active = 'active',
@@ -35,6 +42,9 @@ export interface User {
     createdAt?: string; // ISO date string
     updatedAt?: string;
 }
+
+
+
 
 export interface AddUser {
     firstName: string;
@@ -136,6 +146,20 @@ export interface AddProperty {
     isFurnished?: boolean;
     latitude: string;
     longitude: string;
+}
+
+
+export interface AppNotification {
+  _id: string; // MongoDB ObjectId
+  userId: string; // Reference to User._id
+  message: string;
+  read: boolean;
+  type: "email" | "in-app" | "sms";
+  allowedRoles: RoleEnum[];
+  purpose: NotificationPurposeEnum;
+  relatedId?: string; // Can be a User, Property, Agent, or Transaction ID
+  relatedModel: "User" | "Property" | "Agent" | "Transaction";
+  createdAt: string; // ISO date string
 }
 
 // Add more for other endpoints as needed (e.g., PropertyCreateData)
