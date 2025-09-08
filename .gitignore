@@ -12,6 +12,7 @@
 
 # Ignore .env file
 .env
+
 delete.tsx
 
 # testing
