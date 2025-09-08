@@ -80,7 +80,9 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
       try {
         const response = await agentApi.getApprovedAgents()
         console.log("Response of approved agents", response)
-        const agents = response.data.map((item: any) => ({
+
+        const agentsArray = Array.isArray(response.data) ? response.data : [];
+        const agents = agentsArray.map((item) => ({
           userId: item.user._id,
           status: item.agent.status,
           firstName: item.user.firstName,
@@ -217,12 +219,24 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
     }
   }
 
-  const handleRemoveImage = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      images: prev.images?.filter((_, i) => i !== index) || [],
-    }))
-  }
+  const handleRemoveImage = async (index: number) => {
+    if (!property?._id || !formData.images?.[index]) {
+      toast.error('Property or image not available for deletion');
+      return;
+    }
+
+    try {
+      await propertyApi.deleteImage(property._id, formData.images[index]);
+      setFormData((prev) => ({
+        ...prev,
+        images: prev.images?.filter((_, i) => i !== index) || [],
+      }));
+      toast.success('Image deleted successfully');
+    } catch (error: any) {
+      toast.error(`Failed to delete image: ${error.response?.data?.message || error.message}`);
+      console.error('Delete image error:', error.response?.data || error.message);
+    }
+  };
 
   const handleAddAgent = (userId: string) => {
     const selectedAgent = approvedAgents.find(agent => agent.userId === userId)
@@ -630,7 +644,7 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
                     />
                   </div>
                 </SelectTrigger>
-                <SelectContent className="max-h-60 overflow-auto">
+                <SelectContent className="max-h-60 overflow-auto bg-white">
                   {filteredAgents.map((agent) => {
                     const initials = `${agent.firstName.charAt(0)}${agent.lastName.charAt(0)}`
                     const displayImage = agent.profilePhotos.length > 0

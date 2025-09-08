@@ -816,3 +816,32 @@ export default function UserEditModal({ user, isOpen, onClose, onSave }: UserEdi
 // perfect user edit modal basic one
 
 
+
+// useEffect(() => {
+//     const fetchApprovedAgents = async () => {
+//       try {
+//         const response = await agentApi.getApprovedAgents()
+//         console.log("Response of approved agents", response)
+
+//         // Normalize response payload to an array regardless of API shape
+//         const rawAgents = Array.isArray(response) ? response : Array.isArray(response?.data) ? response.data : Array.isArray(response?.data.agents) ? response.data.agents : Array.isArray(response?.data?.agents) ? response.data.agents : []
+
+//         const agentsArray = Array.isArray(response.data) ? response.data : [];
+
+//         // const agents = rawAgents.map((item: any) => ({
+//         const agents = agentsArray.map((item) => ({
+//           userId: item.user._id,
+//           status: item.agent.status,
+//           firstName: item.user.firstName,
+//           lastName: item.user.lastName,
+//           phone: item.agent.phone,
+//           commissionRate: item.agent.commissionRate,
+//           profilePhotos: item.user.profilePhotos,
+//         }))
+//         setApprovedAgents(agents)
+//       } catch (error) {
+//         toast.error("Failed to fectch approved agents")
+//       }
+//     }
+//     fetchApprovedAgents()
+//   }, [])

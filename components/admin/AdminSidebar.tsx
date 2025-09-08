@@ -12,13 +12,12 @@ import {
   FaUserTie,
   FaCog,
   FaSignOutAlt,
-  FaChevronLeft,
-  FaChevronRight,
   FaBuilding,
   FaChartLine,
   FaHistory,
   FaBell,
 } from "react-icons/fa"
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa6'
 
 export default function AdminSidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -54,14 +53,12 @@ export default function AdminSidebar() {
       <Link href={item.route} className="block">
         <Button
           variant="ghost"
-          className={`w-full justify-start transition-all duration-300 ${
-            isActive ? "bg-blue-50 text-blue-700 border-r-2 border-blue-500" : "hover:bg-gray-50 text-gray-600"
-          } ${!sidebarOpen ? "justify-center" : ""}`}
+          className={`w-full justify-start transition-all duration-300 ${isActive ? "bg-blue-50 text-blue-700 border-r-2 border-blue-500" : "hover:bg-gray-50 text-gray-600"
+            } ${!sidebarOpen ? "justify-center" : ""}`}
         >
           <item.icon
-            className={`${sidebarOpen ? "mr-3" : ""} ${
-              isActive ? item.color : "text-gray-400"
-            } transition-colors duration-300`}
+            className={`${sidebarOpen ? "mr-3" : ""} ${isActive ? item.color : "text-gray-400"
+              } transition-colors duration-300`}
           />
           {sidebarOpen && <span>{item.label}</span>}
         </Button>
@@ -85,15 +82,13 @@ export default function AdminSidebar() {
   }
 
   return (
-    <div
-      className={`${
-        sidebarOpen ? "w-64" : "w-16"
-      } transition-all duration-300 bg-white shadow-lg border-r fixed left-0 top-0 h-full z-40 ${
-        !sidebarOpen ? "rounded-r-2xl m-2 h-[calc(100vh-16px)]" : ""
-      } overflow-y-auto`}
+    <div className={`
+        ${sidebarOpen ? "w-64 border-r" : "w-20 border"} 
+        ${!sidebarOpen ? "rounded-2xl m-2 h-[calc(100vh-16px)]" : ""}
+        transition-all duration-300 bg-white shadow-lg fixed left-0 top-16 h-full z-10`}
     >
       <div className="p-4 border-b">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between relative">
           {sidebarOpen ? (
             <div className="flex items-center">
               <div className="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center mr-2">
@@ -110,7 +105,7 @@ export default function AdminSidebar() {
             variant="ghost"
             size="icon"
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="hover:bg-gray-100 rounded-full"
+            className={`bg-gray-50 hover:bg-gray-100 rounded-full text-blue-500 z-40 absolute ${sidebarOpen ? "hover:border top-50% right-0" : "border scale-90 -right-8"}`}
           >
             {sidebarOpen ? <FaChevronLeft /> : <FaChevronRight />}
           </Button>

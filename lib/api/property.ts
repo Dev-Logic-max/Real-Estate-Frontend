@@ -14,6 +14,7 @@ export const propertyApi = {
             headers: { 'Content-Type': 'multipart/form-data' },
         });
     },
+    deleteImage: (propertyId: string, imageUrl: string) => client.delete(`/property/${propertyId}/images/${encodeURIComponent(imageUrl)}`),
     requestInquiry: (id: string, data: { name: string; email: string; message: string }) => client.post(`/property/${id}/request`, data),
     dealRequest: (id: string, data: { commissionRate: number; terms: string }) => client.post(`/property/${id}/deal-request`, data),
     acceptDeal: (id: string, data: { agentId: string }) => client.post(`/property/${id}/accept-deal`, data),

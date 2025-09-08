@@ -23,6 +23,7 @@ import { toast } from "react-toastify"
 import { FaSearch, FaPlus, FaEye, FaEdit, FaTrash, FaHome, FaBuilding, FaBed, FaBath, FaRulerCombined, FaMapMarkerAlt, FaUser, FaPhone, FaEnvelope } from "react-icons/fa"
 import { PiBathtub, PiBed, PiBuildingApartmentDuotone, PiBuildingDuotone, PiBuildingOfficeDuotone, PiBuildingsDuotone, PiEnvelope, PiEyeBold, PiHouseLineDuotone, PiMapPin, PiMapPinLine, PiPencilSimpleBold, PiPhoneCall, PiRuler, PiTrashBold, PiUserCircle } from "react-icons/pi"
 import { agentApi } from "@/lib/api/agent"
+import { FcApproval } from "react-icons/fc"
 
 export default function PropertiesPage() {
     const [layout, setLayout] = useState("grid")
@@ -237,7 +238,7 @@ export default function PropertiesPage() {
                             {filteredProperties.map((property: any) => (
                                 <Card
                                     key={property._id}
-                                    className="py-0 gap-0 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border-blue-100"
+                                    className="py-0 gap-0 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border-blue-100 group"
                                 >
                                     <div className="relative">
                                         <AutoImageSlider
@@ -310,13 +311,26 @@ export default function PropertiesPage() {
 
                                             {/* Agent Info */}
                                             {property.agents.length > 0 && (
-                                                <div className="p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
-                                                    <div className="flex items-center space-x-2">
-                                                        <FaUser className="text-blue-500" />
+                                                <div className="p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg shadow-xs group-hover:shadow-sm border group-hover:border-blue-300 transition-all duration-200">
+                                                    <div className="flex items-center space-x-3">
+                                                        {property.agents[0].profilePhotos.length > 0 ? (
+                                                            <img
+                                                                src={`${process.env.NEXT_PUBLIC_PICTURES_URL}${property.agents[0].profilePhotos[0]}`}
+                                                                alt={`${property.agents[0].firstName} ${property.agents[0].lastName}`}
+                                                                className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-blue-200 flex items-center justify-center border text-white font-semibold text-sm">
+                                                                {`${property.agents[0].firstName.charAt(0)}${property.agents[0].lastName.charAt(0)}`}
+                                                            </div>
+                                                        )}
                                                         <div className="flex-1">
-                                                            <p className="text-sm font-medium">{property.agents[0].name}</p>
-                                                            <p className="text-xs text-gray-500">{property.agents[0].commissionRate}% commission</p>
+                                                            <p className="flex items-center gap-1 text-sm font-medium text-gray-900">
+                                                                {`${property.agents[0].firstName} ${property.agents[0].lastName}`}<FcApproval className="w-4 h-4"/>
+                                                            </p>
+                                                            <p className="text-xs text-gray-600">{`${property.agents[0].commissionRate}% commission`}</p>
                                                         </div>
+                                                        <FaUser className="text-blue-500 w-4 h-4" />
                                                     </div>
                                                 </div>
                                             )}

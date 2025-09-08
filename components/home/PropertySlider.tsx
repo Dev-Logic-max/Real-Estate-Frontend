@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import AutoImageSlider from "@/components/common/AutoImageSlider"
 import { FaHeart, FaMapMarkerAlt, FaBed, FaBath, FaRuler, FaEye, FaShare, FaChevronLeft, FaChevronRight } from "react-icons/fa"
-import propertiesData from "@/json/properties.json"
+import propertiesData from "@/json/propertiesSlider.json"
 
 interface PropertyCardProps {
   property: {

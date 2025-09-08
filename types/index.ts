@@ -147,3 +147,26 @@ export interface AddProperty {
 }
 
 // Add more for other endpoints as needed (e.g., PropertyCreateData)
+
+export interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
+export interface PropertyModel {
+  _id: string;
+  title?: string;
+  description?: string;
+  price?: number;
+  type: "sale" | "rent";
+  images?: string[];
+  status?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  coordinates?: Coordinates;
+  bedrooms?: number;
+  bathrooms?: number;
+  propertyType?: string;
+  purpose?: string;
+}

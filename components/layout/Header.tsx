@@ -4,17 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import {
-    FaUser,
-    FaBell,
-    FaHome,
-    FaSellsy,
-    FaUsers,
-    FaTools,
-    FaBuilding,
-    FaTachometerAlt,
-    FaSignInAlt,
-} from "react-icons/fa"
+import { FaUser, FaBell, FaHome, FaSellsy, FaUsers, FaTools, FaBuilding, FaTachometerAlt, FaSignInAlt } from "react-icons/fa"
 import NotificationsModal from "../modals/Notifications"
 import SavedModal from "../modals/Saved"
 import { useAuth } from "@/hooks/useAuth"
@@ -22,6 +12,12 @@ import { useAuth } from "@/hooks/useAuth"
 export default function Header() {
     const [activeTab, setActiveTab] = useState("")
     const { user, logout } = useAuth()
+
+    const getDashboardPath = () => {
+        if (user?.roles?.includes(1)) return "/admin/dashboard";
+        if (user?.roles?.includes(5)) return "/agent/dashboard";
+        return "/dashboard";
+    }
 
     const navItems = [
         {
@@ -64,14 +60,18 @@ export default function Header() {
             color: "text-pink-600",
             hoverColor: "hover:bg-pink-50 hover:text-pink-700",
         },
-        {
-            id: "dashboard",
-            label: "Dashboard",
-            icon: FaTachometerAlt,
-            href: "/admin/dashboard",
-            color: "text-indigo-600",
-            hoverColor: "hover:bg-indigo-50 hover:text-indigo-700",
-        },
+        ...(user
+            ? [
+                {
+                    id: "dashboard",
+                    label: "Dashboard",
+                    icon: FaTachometerAlt,
+                    href: getDashboardPath(),
+                    color: "text-indigo-600",
+                    hoverColor: "hover:bg-indigo-50 hover:text-indigo-700",
+                },
+            ] : []
+        ),
     ]
 
     return (
@@ -93,8 +93,8 @@ export default function Header() {
                                     variant="ghost"
                                     onClick={() => setActiveTab(item.id)}
                                     className={`transition-all duration-300 ${activeTab === item.id
-                                            ? `${item.color} bg-gradient-to-r from-blue-50 to-purple-50`
-                                            : `text-gray-600 ${item.hoverColor}`
+                                        ? `${item.color} bg-gradient-to-r from-blue-50 to-purple-50`
+                                        : `text-gray-600 ${item.hoverColor}`
                                         }`}
                                 >
                                     <item.icon

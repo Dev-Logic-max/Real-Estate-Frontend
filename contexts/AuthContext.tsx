@@ -1,4 +1,4 @@
-'use client'; // If using App Router
+'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation'; // Or 'next/router' for Pages Router
@@ -28,6 +28,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       username: `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
       roles: userData.roles,
     };
+    document.cookie = `token=${token}; path=/;`;
+    document.cookie = `user=${JSON.stringify(storedUser)} ; path=/;`;
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(storedUser));
     setUser(storedUser);
@@ -73,6 +75,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     try {
       await authApi.logout();
+      document.cookie = "token=; Max-Age=0; path=/";
+      document.cookie = "user=; Max-Age=0; path=/";
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       setUser(null);
@@ -85,9 +89,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const verifyToken = async () => {
     try {
-      // setLoading(true);
+      setLoading(true);
       const response = await authApi.verify();
-      console.log('Verify response:', response.data); // Debug the response
       const { user: userData, valid } = response.data;
       if (valid && userData) {
         const token = localStorage.getItem('token') || '';
@@ -98,9 +101,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       toast.error("Verification Failed")
       console.error('Token verification error:', error);
-      // localStorage.removeItem('token');
-      // localStorage.removeItem('user');
-      // setUser(null);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      setUser(null);
       router.push('/auth/login');
     } finally {
       setLoading(false);
@@ -116,10 +119,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(parsedUser);
         verifyToken(); // Validate and refresh token
       } catch (error) {
-        // localStorage.removeItem('token');
-        // localStorage.removeItem('user');
-        // setUser(null);
         toast.error('Failed to load user data');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setUser(null);
       }
     } else {
       setUser(null);
