@@ -29,9 +29,9 @@ export async function middleware(request: NextRequest) {
   let user = userStr ? JSON.parse(userStr) : null;
 
   // ⚠️ Redirect unauthenticated users
-  if (!token && !publicRoutes.includes(pathname)) {
-    return NextResponse.redirect(new URL("/auth/login", request.url));
-  }
+  // if (!token && !publicRoutes.includes(pathname)) {
+  //   return NextResponse.redirect(new URL("/auth/login", request.url));
+  // }
 
   // 🛡️ Restrict access to admin routes
   if (pathname.startsWith("/admin") && (!user || !user.roles.includes(1))) {

@@ -1,0 +1,87 @@
+{
+  "userStats": {
+    "totalProperties": 12,
+    "activeListings": 8,
+    "soldProperties": 4,
+    "totalViews": 2847,
+    "inquiries": 23,
+    "favoriteProperties": 15
+  },
+  "recentActivity": [
+    {
+      "id": 1,
+      "type": "property_viewed",
+      "title": "Your property 'Modern Downtown Condo' was viewed",
+      "timestamp": "2024-01-15T10:30:00Z",
+      "icon": "👁️"
+    },
+    {
+      "id": 2,
+      "type": "inquiry_received",
+      "title": "New inquiry for 'Luxury Villa in Hills'",
+      "timestamp": "2024-01-15T09:15:00Z",
+      "icon": "💬"
+    },
+    {
+      "id": 3,
+      "type": "property_sold",
+      "title": "Congratulations! Your property was sold",
+      "timestamp": "2024-01-14T16:45:00Z",
+      "icon": "🎉"
+    }
+  ],
+  "userProperties": [
+    {
+      "id": 1,
+      "title": "Modern Downtown Condo",
+      "price": 450000,
+      "status": "active",
+      "views": 234,
+      "inquiries": 12,
+      "images": ["/placeholder.svg?height=300&width=400"],
+      "location": "Downtown, NY",
+      "type": "Condo",
+      "bedrooms": 2,
+      "bathrooms": 2,
+      "area": 1200
+    },
+    {
+      "id": 2,
+      "title": "Luxury Villa in Hills",
+      "price": 850000,
+      "status": "pending",
+      "views": 189,
+      "inquiries": 8,
+      "images": ["/placeholder.svg?height=300&width=400"],
+      "location": "Beverly Hills, CA",
+      "type": "Villa",
+      "bedrooms": 4,
+      "bathrooms": 3,
+      "area": 2800
+    }
+  ],
+  "connectedAgents": [
+    {
+      "id": 1,
+      "name": "Sarah Johnson",
+      "email": "sarah@realestate.com",
+      "phone": "+1 (555) 123-4567",
+      "specialization": "Luxury Properties",
+      "rating": 4.9,
+      "avatar": "/placeholder.svg?height=60&width=60",
+      "propertiesHandled": 15,
+      "status": "active"
+    },
+    {
+      "id": 2,
+      "name": "Michael Chen",
+      "email": "michael@realestate.com",
+      "phone": "+1 (555) 987-6543",
+      "specialization": "Commercial Real Estate",
+      "rating": 4.8,
+      "avatar": "/placeholder.svg?height=60&width=60",
+      "propertiesHandled": 8,
+      "status": "active"
+    }
+  ]
+}

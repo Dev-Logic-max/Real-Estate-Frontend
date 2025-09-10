@@ -7,12 +7,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Badge } from "@/components/ui/badge"
 import { FaHome, FaUser, FaBell, FaSignOutAlt, FaEyeSlash, FaEye, FaCog } from "react-icons/fa"
 
-interface DashboardHeaderProps {
+interface AdminDashboardHeaderProps {
   isHeaderVisible: boolean
   toggleHeader: () => void
 }
 
-export default function AdminHeader({ isHeaderVisible, toggleHeader }: DashboardHeaderProps) {
+export default function AdminHeader({ isHeaderVisible, toggleHeader }: AdminDashboardHeaderProps) {
   const [notifications] = useState([
     { id: 1, title: "New user registered", type: "success" },
     { id: 2, title: "Property listing pending approval", type: "warning" },

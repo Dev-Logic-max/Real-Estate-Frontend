@@ -5,18 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import {
-  FaTachometerAlt,
-  FaUsers,
-  FaHome,
-  FaUserTie,
-  FaCog,
-  FaSignOutAlt,
-  FaBuilding,
-  FaChartLine,
-  FaHistory,
-  FaBell,
-} from "react-icons/fa"
+import { FaTachometerAlt, FaUsers, FaHome, FaUserTie, FaCog, FaSignOutAlt, FaBuilding, FaChartLine, FaHistory, FaBell } from "react-icons/fa"
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa6'
 
 export default function AdminSidebar() {
