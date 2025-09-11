@@ -1,0 +1,38 @@
+{
+  "user": {
+    "id": "user_001",
+    "firstName": "John",
+    "lastName": "Smith",
+    "email": "john.smith@example.com",
+    "phone": "+1 (555) 123-4567",
+    "role": "buyer",
+    "status": "active",
+    "avatar": "/placeholder.svg?height=120&width=120",
+    "joinDate": "2024-01-15",
+    "address": {
+      "street": "123 Main Street",
+      "city": "New York",
+      "state": "NY",
+      "country": "United States",
+      "zipCode": "10001"
+    },
+    "preferences": {
+      "emailNotifications": true,
+      "smsNotifications": false,
+      "marketingEmails": true,
+      "propertyAlerts": true,
+      "newsletter": true
+    },
+    "stats": {
+      "propertiesViewed": 45,
+      "savedProperties": 12,
+      "inquiriesSent": 8,
+      "toursScheduled": 3
+    },
+    "profilePhotos": [
+      "/placeholder.svg?height=120&width=120",
+      "/placeholder.svg?height=120&width=120",
+      "/placeholder.svg?height=120&width=120"
+    ]
+  }
+}
