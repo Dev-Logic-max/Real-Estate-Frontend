@@ -1,20 +1,22 @@
 "use client"
 
 import type React from "react"
-
 import { useEffect, useState } from "react"
+
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
 import { FaMinus, FaPlus, FaSave, FaTimes } from "react-icons/fa"
 import { LiaUserEditSolid } from "react-icons/lia";
+import { FiX } from "react-icons/fi"
+
 import { RoleEnum, StatusEnum, User } from "@/types"
-import { roleMap } from "@/utils"
 import { userApi } from "@/lib/api/user"
 import { toast } from "react-toastify"
-import { FiX } from "react-icons/fi"
+import { roleMap } from "@/utils"
 
 interface UserEditModalProps {
     user: User | null

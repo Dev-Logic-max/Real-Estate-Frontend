@@ -2,7 +2,9 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+
 import { FaExclamationTriangle, FaTimes } from "react-icons/fa"
+
 import { Property } from "@/types"
 
 interface PropertyDeleteModalProps {

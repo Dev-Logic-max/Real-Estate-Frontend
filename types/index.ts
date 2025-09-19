@@ -97,6 +97,10 @@ export interface Property {
     propertyType?: string;
     purpose?: string;
     isFurnished?: boolean;
+    latitude: string;
+    longitude: string;
+    listingDate: string;
+    views: string;
     createdAt?: string; 
     updatedAt?: string;
 }
@@ -126,7 +130,7 @@ export interface AddProperty {
     contactName?: string;
     contactEmail?: string;
     contactNumber?: string;
-    availableFrom?: Date;
+    availableFrom?: string;
     currency?: string;
     rentPeriod?: string;
     address?: string;

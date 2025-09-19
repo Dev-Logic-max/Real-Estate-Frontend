@@ -1,25 +1,29 @@
 "use client"
 
 import type React from "react"
-
 import { useEffect, useRef, useState } from "react"
+
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Separator } from "@/components/ui/separator"
+import { Textarea } from "@/components/ui/textarea"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { FaPlus, FaTrash } from "react-icons/fa"
+
+import { FiAlignLeft, FiCalendar, FiCamera, FiCheckSquare, FiCrosshair, FiDollarSign, FiDroplet, FiEdit3, FiFlag, FiGlobe, FiHome, FiList, FiMail, FiMap, FiMapPin, FiNavigation, FiPhone, FiSearch, FiSettings, FiSquare, FiTag, FiThermometer, FiUpload, FiUser, FiWind, FiX } from "react-icons/fi"
+import { FaCar, FaPlus, FaTrash } from "react-icons/fa"
 import { PiBuildingApartmentDuotone } from "react-icons/pi"
-import { FiX } from "react-icons/fi"
-import { Property } from "@/types"
+
 import AutoImageSlider from "../common/AutoImageSlider"
-import { toast } from "react-toastify"
 import { propertyApi } from "@/lib/api/property"
 import { agentApi } from "@/lib/api/agent"
+import MapboxMap from "../map/MapboxMap"
+
+import { toast } from "react-toastify"
+import { Property } from "@/types"
 
 interface AgentOption {
   userId: string
@@ -44,35 +48,41 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
   const [previewImage, setPreviewImage] = useState<string | null>(null) // For previewing uploaded image
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [newAmenity, setNewAmenity] = useState("")
+  const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null)
   const [formData, setFormData] = useState<Partial<Property>>({
+    images: [],
     title: "",
     description: "",
     price: 0,
-    area: 0,
-    type: "sale",
-    images: [],
-    status: "pending",
-    city: "",
-    state: "",
-    country: "",
-    address: "",
     bedrooms: 0,
     bathrooms: 0,
-    propertyType: "apartment",
-    purpose: "residential",
-    isFurnished: false,
     parkingSpaces: 0,
+    area: 0,
     floorNumber: 0,
     heatingSystem: "",
     coolingSystem: "",
-    amenities: [],
-    contactName: "",
-    contactEmail: "",
-    contactNumber: "",
+    isFurnished: false,
+    type: "sale",
+    propertyType: "apartment",
+    purpose: "residential",
+    latitude: "",
+    longitude: "",
     availableFrom: undefined,
     currency: "USD",
     rentPeriod: "",
+    contactName: "",
+    contactEmail: "",
+    contactNumber: "",
+    address: "",
+    city: "",
+    state: "",
+    country: "",
+    amenities: [],
+    status: "pending",
+    videos: [],
+    views: "0",
     agents: [],
+    listingDate: new Date().toISOString().split("T")[0],
   })
 
   useEffect(() => {
@@ -132,7 +142,16 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
         currency: property.currency || "USD",
         rentPeriod: property.rentPeriod || "",
         agents: property.agents || [],
+        latitude: property.location?.coordinates[1]?.toString() || "", // Extract latitude
+        longitude: property.location?.coordinates[0]?.toString() || "", // Extract longitude
       })
+      // Set initial coordinates if location exists
+      if (property.location?.coordinates) {
+        setCoordinates({
+          lat: property.location.coordinates[1],
+          lng: property.location.coordinates[0],
+        })
+      }
     } else {
       setFormData({
         title: "",
@@ -163,12 +182,15 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
         currency: "USD",
         rentPeriod: "",
         agents: [],
+        latitude: "",
+        longitude: "",
       })
+      setCoordinates(null)
     }
   }, [property])
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData((prev) => {
+    setFormData((prev: any) => {
       if (field === "availableFrom" && value) {
         return { ...prev, [field]: new Date(value) } // Convert string to Date
       }
@@ -267,13 +289,48 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
     }))
   }
 
+  const handleFetchCoordinates = async () => {
+    if (!formData.address || !formData.city || !formData.state || !formData.country) {
+      toast.error("Please enter a complete address (street, city, state, country).")
+      return
+    }
+
+    try {
+      const query = `${formData.address}, ${formData.city}, ${formData.state}, ${formData.country}`
+      const response = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}&limit=1`
+      )
+      const data = await response.json()
+
+      if (data.features && data.features.length > 0) {
+        const [lng, lat] = data.features[0].geometry.coordinates
+        setCoordinates({ lat, lng })
+        setFormData((prev) => ({
+          ...prev,
+          latitude: lat.toString(),
+          longitude: lng.toString(),
+
+          location: { type: "Point", coordinates: [lng, lat] },
+        }))
+        toast.success("Coordinates fetched successfully!")
+      } else {
+        toast.error("No coordinates found for the address.")
+      }
+    } catch (error) {
+      console.error("Error fetching coordinates:", error)
+      toast.error("Failed to fetch coordinates. Please check your address or try again.")
+    }
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // console.log("Submitting formData before save:", formData) // Debug log before save
+
+    // console.log("Submitting formData before save:", formData) // Debug log
     if (!formData.images || formData.images.length === 0) {
       toast.warning("Images array is empty")
       console.warn("Images array is empty or undefined, check state update")
     }
+
     onSave(formData)
     onClose()
   }
@@ -305,7 +362,10 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
 
         {/* Image Gallery */}
         <div className="space-y-4 mt-4">
-          <h3 className="text-lg font-semibold text-gray-900">Property Images</h3>
+          <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            <FiCamera className="h-5 w-5 text-orange-600" />
+            Property Images
+          </h3>
           {formData.images && formData.images.length > 0 ? (
             <>
               <AutoImageSlider
@@ -342,25 +402,30 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
           )}
           {/* Image Upload Section */}
           <div className="space-y-2">
-            <Label htmlFor="imageUpload">Upload New Image</Label>
+            <Label htmlFor="imageUpload" className="text-slate-700 font-medium flex items-center gap-2">
+              <FiUpload className="h-4 w-4 text-blue-500" />
+              Upload New Image
+            </Label>
             <div className="flex gap-2">
-              <Input
-                id="imageUpload"
-                type="file"
-                accept="image/*"
-                multiple
-                ref={fileInputRef}
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-              <Button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <FaPlus className="w-4 h-4" /> Upload Image
-              </Button>
+              <div className="flex gap-2">
+                <Input
+                  id="imageUpload"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  ref={fileInputRef}
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  variant="outline"
+                  className="flex items-center gap-2 border-blue-300 text-blue-600 hover:bg-blue-50 bg-transparent"
+                >
+                  <FaPlus className="w-4 h-4" /> Upload Image
+                </Button>
+              </div>
               {previewImage && (
                 <div className="relative">
                   <img
@@ -384,63 +449,82 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Basic Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">Basic Information</h3>
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <FiHome className="h-5 w-5 text-blue-600" />
+              Basic Information
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="title">Property Title *</Label>
+              <div>
+                <Label htmlFor="title" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FiEdit3 className="h-4 w-4 text-blue-500" />
+                  Property Title *
+                </Label>
                 <Input
                   id="title"
-                  value={formData.title}
+                  value={formData.title || ""}
                   onChange={(e) => handleInputChange("title", e.target.value)}
+                  className="border-slate-200 focus:border-blue-400 focus:ring-blue-400 bg-gradient-to-r from-blue-50/30 to-indigo-50/30"
                   placeholder="Enter property title"
                   required
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="price">Price *</Label>
+              <div>
+                <Label htmlFor="price" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FiDollarSign className="h-4 w-4 text-green-500" />
+                  Price *
+                </Label>
                 <Input
                   id="price"
                   type="number"
-                  value={formData.price}
+                  value={formData.price || ""}
                   onChange={(e) => handleInputChange("price", Number(e.target.value))}
+                  className="border-slate-200 focus:border-green-400 focus:ring-green-400 bg-gradient-to-r from-green-50/30 to-emerald-50/30"
                   placeholder="Enter price"
                   required
                 />
               </div>
             </div>
-
             <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description" className="text-slate-700 font-medium flex items-center gap-2">
+                <FiAlignLeft className="h-4 w-4 text-purple-500" />
+                Description
+              </Label>
               <Textarea
                 id="description"
-                value={formData.description}
-                onChange={(e: any) => handleInputChange("description", e.target.value)}
-                placeholder="Enter property description"
-                rows={3}
+                value={formData.description || ""}
+                onChange={(e) => handleInputChange("description", e.target.value)}
+                className="border-slate-200 focus:border-purple-400 focus:ring-purple-400 min-h-[120px] bg-gradient-to-r from-purple-50/30 to-pink-50/30"
+                placeholder="Describe your property..."
+                rows={5}
               />
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="type">Listing Type *</Label>
-                <Select value={formData.type} onValueChange={(value) => handleInputChange("type", value)}>
-                  <SelectTrigger>
+              <div>
+                <Label htmlFor="type" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FiTag className="h-4 w-4 text-green-500" />
+                  Listing Type *
+                </Label>
+                <Select value={formData.type || "sale"} onValueChange={(value) => handleInputChange("type", value)}>
+                  <SelectTrigger className="border-slate-200 focus:border-green-400 focus:ring-green-400 bg-gradient-to-r from-green-50/30 to-emerald-50/30">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white">
+                  <SelectContent>
                     <SelectItem value="sale">For Sale</SelectItem>
                     <SelectItem value="rent">For Rent</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <Select value={formData.status} onValueChange={(value) => handleInputChange("status", value)}>
-                  <SelectTrigger>
+              <div>
+                <Label htmlFor="status" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FiCheckSquare className="h-4 w-4 text-orange-500" />
+                  Status
+                </Label>
+                <Select value={formData.status || "pending"} onValueChange={(value) => handleInputChange("status", value)}>
+                  <SelectTrigger className="border-slate-200 focus:border-orange-400 focus:ring-orange-400 bg-gradient-to-r from-orange-50/30 to-amber-50/30">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white">
+                  <SelectContent>
                     <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="active">Active</SelectItem>
                     <SelectItem value="inactive">Inactive</SelectItem>
@@ -448,16 +532,16 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="propertyType">Property Type</Label>
-                <Select
-                  value={formData.propertyType}
-                  onValueChange={(value) => handleInputChange("propertyType", value)}
-                >
-                  <SelectTrigger>
+              <div>
+                <Label htmlFor="propertyType" className="text-slate-700 font-medium flex items-center gap-2">
+                  <PiBuildingApartmentDuotone className="h-4 w-4 text-indigo-500" />
+                  Property Type
+                </Label>
+                <Select value={formData.propertyType || "apartment"} onValueChange={(value) => handleInputChange("propertyType", value)}>
+                  <SelectTrigger className="border-slate-200 focus:border-indigo-400 focus:ring-indigo-400 bg-gradient-to-r from-indigo-50/30 to-blue-50/30">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white">
+                  <SelectContent>
                     <SelectItem value="apartment">Apartment</SelectItem>
                     <SelectItem value="house">House</SelectItem>
                     <SelectItem value="villa">Villa</SelectItem>
@@ -472,102 +556,222 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
           <Separator />
 
           {/* Property Details */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">Property Details</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="bedrooms">Bedrooms</Label>
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <FiSettings className="h-5 w-5 text-teal-600" />
+              Property Details
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <Label htmlFor="bedrooms" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FiSquare className="h-4 w-4 text-indigo-500" />
+                  Bedrooms
+                </Label>
                 <Input
                   id="bedrooms"
                   type="number"
                   value={formData.bedrooms || ""}
                   onChange={(e) => handleInputChange("bedrooms", Number(e.target.value))}
+                  className="border-slate-200 focus:border-indigo-400 focus:ring-indigo-400 bg-gradient-to-r from-indigo-50/30 to-blue-50/30"
                   placeholder="0"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="bathrooms">Bathrooms</Label>
+              <div>
+                <Label htmlFor="bathrooms" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FiDroplet className="h-4 w-4 text-cyan-500" />
+                  Bathrooms
+                </Label>
                 <Input
                   id="bathrooms"
                   type="number"
                   value={formData.bathrooms || ""}
                   onChange={(e) => handleInputChange("bathrooms", Number(e.target.value))}
+                  className="border-slate-200 focus:border-cyan-400 focus:ring-cyan-400 bg-gradient-to-r from-cyan-50/30 to-teal-50/30"
                   placeholder="0"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="area">Area (sq ft)</Label>
+              <div>
+                <Label htmlFor="area" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FiMap className="h-4 w-4 text-rose-500" />
+                  Area (sq ft)
+                </Label>
                 <Input
                   id="area"
                   type="number"
                   value={formData.area || ""}
                   onChange={(e) => handleInputChange("area", Number(e.target.value))}
+                  className="border-slate-200 focus:border-rose-400 focus:ring-rose-400 bg-gradient-to-r from-rose-50/30 to-pink-50/30"
                   placeholder="0"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="parkingSpaces">Parking Spaces</Label>
+              <div>
+                <Label htmlFor="parkingSpaces" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FaCar className="h-4 w-4 text-violet-500" />
+                  Parking Spaces
+                </Label>
                 <Input
                   id="parkingSpaces"
                   type="number"
                   value={formData.parkingSpaces || ""}
                   onChange={(e) => handleInputChange("parkingSpaces", Number(e.target.value))}
+                  className="border-slate-200 focus:border-violet-400 focus:ring-violet-400 bg-gradient-to-r from-violet-50/30 to-purple-50/30"
                   placeholder="0"
                 />
               </div>
             </div>
-
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg border border-emerald-200">
               <Checkbox
                 id="isFurnished"
-                checked={formData.isFurnished}
+                checked={formData.isFurnished || false}
                 onCheckedChange={(checked) => handleInputChange("isFurnished", checked)}
               />
-              <Label htmlFor="isFurnished">Property is furnished</Label>
+              <Label htmlFor="isFurnished" className="text-emerald-700 font-medium flex items-center gap-2">
+                <FiHome className="h-5 w-5" />
+                Property is furnished
+              </Label>
             </div>
           </div>
 
           <Separator />
 
           {/* Location */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">Location</h3>
-            <div className="space-y-2">
-              <Label htmlFor="address">Address</Label>
-              <Input
-                id="address"
-                value={formData.address}
-                onChange={(e) => handleInputChange("address", e.target.value)}
-                placeholder="Enter full address"
-              />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="city">City</Label>
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <FiMapPin className="h-5 w-5 text-red-600" />
+              Location
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="address" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FiMapPin className="h-4 w-4 text-red-500" />
+                  Street Address *
+                </Label>
+                <Input
+                  id="address"
+                  value={formData.address || ""}
+                  onChange={(e) => handleInputChange("address", e.target.value)}
+                  className="border-slate-200 focus:border-red-400 focus:ring-red-400 bg-gradient-to-r from-red-50/30 to-rose-50/30"
+                  placeholder="Enter street address"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="city" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FiFlag className="h-4 w-4 text-blue-500" />
+                  City *
+                </Label>
                 <Input
                   id="city"
-                  value={formData.city}
+                  value={formData.city || ""}
                   onChange={(e) => handleInputChange("city", e.target.value)}
+                  className="border-slate-200 focus:border-blue-400 focus:ring-blue-400 bg-gradient-to-r from-blue-50/30 to-indigo-50/30"
                   placeholder="Enter city"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="state">State</Label>
+              <div>
+                <Label htmlFor="state" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FiFlag className="h-4 w-4 text-green-500" />
+                  State/Province *
+                </Label>
                 <Input
                   id="state"
-                  value={formData.state}
+                  value={formData.state || ""}
                   onChange={(e) => handleInputChange("state", e.target.value)}
-                  placeholder="Enter state"
+                  className="border-slate-200 focus:border-green-400 focus:ring-green-400 bg-gradient-to-r from-green-50/30 to-emerald-50/30"
+                  placeholder="Enter state/Province"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="country">Country</Label>
+              <div>
+                <Label htmlFor="country" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FiGlobe className="h-4 w-4 text-purple-500" />
+                  Country *
+                </Label>
                 <Input
                   id="country"
-                  value={formData.country}
+                  value={formData.country || ""}
                   onChange={(e) => handleInputChange("country", e.target.value)}
+                  className="border-slate-200 focus:border-purple-400 focus:ring-purple-400 bg-gradient-to-r from-purple-50/30 to-pink-50/30"
                   placeholder="Enter country"
                 />
+              </div>
+              <div>
+                <Label htmlFor="floorNumber" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FiSettings className="h-4 w-4 text-orange-500" />
+                  Floor Number
+                </Label>
+                <Input
+                  id="floorNumber"
+                  type="number"
+                  value={formData.floorNumber || ""}
+                  onChange={(e) => handleInputChange("floorNumber", Number(e.target.value))}
+                  className="border-slate-200 focus:border-orange-400 focus:ring-orange-400 bg-gradient-to-r from-orange-50/30 to-amber-50/30"
+                  placeholder="Floor number"
+                />
+              </div>
+            </div>
+            <div className="md:col-span-2">
+              <Button
+                type="button"
+                onClick={handleFetchCoordinates}
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg"
+              >
+                <FiNavigation className="mr-2 h-4 w-4" />
+                Fetch Coordinates
+              </Button>
+            </div>
+            {coordinates && (
+              <div className="md:col-span-2 rounded-xl overflow-hidden border border-gray-300 mt-4">
+                <MapboxMap
+                  latitude={coordinates.lat}
+                  longitude={coordinates.lng}
+                  onCoordsChange={(lat, lng) => {
+                    setCoordinates({ lat, lng })
+                    setFormData((prev) => ({
+                      ...prev,
+                      latitude: lat.toString(),
+                      longitude: lng.toString(),
+                      location: { type: "Point", coordinates: [lng, lat] },
+                    }))
+                    // toast.info("🗺️ Coordinates updated")
+                    // toast.success("📍Custom location selected!")
+                  }}
+                />
+              </div>
+            )}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200 mt-4">
+              <h4 className="text-lg font-semibold text-blue-800 mb-3 flex items-center gap-2">
+                <FiNavigation className="h-5 w-5" />
+                GPS Coordinates
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="latitude" className="text-blue-700 font-medium flex items-center gap-2">
+                    <FiCrosshair className="h-4 w-4" />
+                    Latitude
+                  </Label>
+                  <Input
+                    id="latitude"
+                    value={formData.latitude || ""}
+                    onChange={(e) => handleInputChange("latitude", e.target.value)}
+                    className="border-blue-200 focus:border-blue-400 focus:ring-blue-400 bg-white/50"
+                    placeholder="e.g., 40.7128"
+                    disabled
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="longitude" className="text-blue-700 font-medium flex items-center gap-2">
+                    <FiCrosshair className="h-4 w-4" />
+                    Longitude
+                  </Label>
+                  <Input
+                    id="longitude"
+                    value={formData.longitude || ""}
+                    onChange={(e) => handleInputChange("longitude", e.target.value)}
+                    className="border-blue-200 focus:border-blue-400 focus:ring-blue-400 bg-white/50"
+                    placeholder="e.g., -74.0060"
+                    disabled
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -575,35 +779,50 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
           <Separator />
 
           {/* Contact Information */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">Contact Information</h3>
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <FiUser className="h-5 w-5 text-purple-600" />
+              Contact Information
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="contactName">Contact Name</Label>
+              <div>
+                <Label htmlFor="contactName" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FiUser className="h-4 w-4 text-blue-500" />
+                  Contact Name
+                </Label>
                 <Input
                   id="contactName"
-                  value={formData.contactName}
+                  value={formData.contactName || ""}
                   onChange={(e) => handleInputChange("contactName", e.target.value)}
+                  className="border-slate-200 focus:border-blue-400 focus:ring-blue-400 bg-gradient-to-r from-blue-50/30 to-indigo-50/30"
                   placeholder="Enter contact name"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="contactEmail">Contact Email</Label>
+              <div>
+                <Label htmlFor="contactEmail" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FiMail className="h-4 w-4 text-green-500" />
+                  Contact Email
+                </Label>
                 <Input
                   id="contactEmail"
                   type="email"
-                  value={formData.contactEmail}
+                  value={formData.contactEmail || ""}
                   onChange={(e) => handleInputChange("contactEmail", e.target.value)}
-                  placeholder="Enter contact email"
+                  className="border-slate-200 focus:border-green-400 focus:ring-green-400 bg-gradient-to-r from-green-50/30 to-emerald-50/30"
+                  placeholder="Enter email address"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="contactNumber">Contact Number</Label>
+              <div>
+                <Label htmlFor="contactNumber" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FiPhone className="h-4 w-4 text-purple-500" />
+                  Contact Number
+                </Label>
                 <Input
                   id="contactNumber"
-                  value={formData.contactNumber}
+                  value={formData.contactNumber || ""}
                   onChange={(e) => handleInputChange("contactNumber", e.target.value)}
-                  placeholder="Enter contact number"
+                  className="border-slate-200 focus:border-purple-400 focus:ring-purple-400 bg-gradient-to-r from-purple-50/30 to-pink-50/30"
+                  placeholder="Enter phone number"
                 />
               </div>
             </div>
@@ -612,29 +831,89 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
           <Separator />
 
           {/* Availability */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">Availability</h3>
-            <div className="space-y-2">
-              <Label htmlFor="availableFrom">Available From</Label>
-              <Input
-                id="availableFrom"
-                type="date"
-                value={formData.availableFrom instanceof Date ? formData.availableFrom.toISOString().split("T")[0] : ""}
-                onChange={(e) => handleInputChange("availableFrom", e.target.value)}
-                placeholder="Select available date"
-              />
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <FiCalendar className="h-5 w-5 text-green-600" />
+              Availability
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="availableFrom" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FiCalendar className="h-4 w-4 text-green-500" />
+                  Available From
+                </Label>
+                <Input
+                  id="availableFrom"
+                  type="date"
+                  value={formData.availableFrom instanceof Date ? formData.availableFrom.toISOString().split("T")[0] : ""}
+                  onChange={(e) => handleInputChange("availableFrom", e.target.value)}
+                  className="border-slate-200 focus:border-green-400 focus:ring-green-400 bg-gradient-to-r from-green-50/30 to-emerald-50/30"
+                  placeholder="Select available date"
+                />
+              </div>
+              <div>
+                <Label htmlFor="purpose" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FiHome className="h-4 w-4 text-teal-500" />
+                  Purpose
+                </Label>
+                <Select value={formData.purpose || "residential"} onValueChange={(value) => handleInputChange("purpose", value)}>
+                  <SelectTrigger className="border-slate-200 focus:border-teal-400 focus:ring-teal-400 bg-gradient-to-r from-teal-50/30 to-cyan-50/30">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="residential">Residential</SelectItem>
+                    <SelectItem value="commercial">Commercial</SelectItem>
+                    <SelectItem value="industrial">Industrial</SelectItem>
+                    <SelectItem value="mixed">Mixed Use</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="heatingSystem" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FiThermometer className="h-4 w-4 text-rose-500" />
+                  Heating System
+                </Label>
+                <Input
+                  id="heatingSystem"
+                  value={formData.heatingSystem || ""}
+                  onChange={(e) => handleInputChange("heatingSystem", e.target.value)}
+                  className="border-slate-200 focus:border-rose-400 focus:ring-rose-400 bg-gradient-to-r from-rose-50/30 to-pink-50/30"
+                  placeholder="e.g., Central heating"
+                />
+              </div>
+              <div>
+                <Label htmlFor="coolingSystem" className="text-slate-700 font-medium flex items-center gap-2">
+                  <FiWind className="h-4 w-4 text-cyan-500" />
+                  Cooling System
+                </Label>
+                <Input
+                  id="coolingSystem"
+                  value={formData.coolingSystem || ""}
+                  onChange={(e) => handleInputChange("coolingSystem", e.target.value)}
+                  className="border-slate-200 focus:border-cyan-400 focus:ring-cyan-400 bg-gradient-to-r from-cyan-50/30 to-teal-50/30"
+                  placeholder="e.g., Central AC"
+                />
+              </div>
             </div>
           </div>
 
           <Separator />
 
           {/* Agents */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">Assigned Agents</h3>
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <FiUser className="h-5 w-5 text-indigo-600" />
+              Assigned Agents
+            </h3>
             <div className="space-y-2">
-              <Label htmlFor="agentSearch">Search and Add Agent</Label>
+              <Label htmlFor="agentSearch" className="text-slate-700 font-medium flex items-center gap-2">
+                <FiSearch className="h-4 w-4 text-blue-500" />
+                Search and Add Agent
+              </Label>
               <Select onValueChange={handleAddAgent} value="">
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full border-slate-200 focus:border-blue-400 focus:ring-blue-400 bg-gradient-to-r from-blue-50/30 to-indigo-50/30">
                   <div className="flex items-center gap-2">
                     <Input
                       placeholder="Search agents..."
@@ -650,7 +929,6 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
                     const displayImage = agent.profilePhotos.length > 0
                       ? `${process.env.NEXT_PUBLIC_PICTURES_URL}${agent.profilePhotos[0]}`
                       : undefined
-
                     return (
                       <SelectItem key={agent.userId} value={agent.userId} className="flex items-center gap-2 p-2 hover:bg-gray-100">
                         {displayImage ? (
@@ -682,7 +960,6 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
                 const displayImage = matchedAgent.profilePhotos.length > 0
                   ? `${process.env.NEXT_PUBLIC_PICTURES_URL}${matchedAgent.profilePhotos[0]}`
                   : undefined
-
                 return (
                   <Badge
                     key={agent.agentId}
@@ -716,22 +993,26 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
           <Separator />
 
           {/* Amenities */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">Amenities</h3>
+          <div className="space-y-6">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <FiList className="h-5 w-5 text-green-600" />
+              Amenities
+            </h3>
             <div className="flex gap-2">
               <Input
                 value={newAmenity}
                 onChange={(e) => setNewAmenity(e.target.value)}
                 placeholder="Add amenity"
                 onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), handleAddAmenity())}
+                className="border-slate-200 focus:border-green-400 focus:ring-green-400 bg-gradient-to-r from-green-50/30 to-emerald-50/30"
               />
-              <Button type="button" onClick={handleAddAmenity} variant="outline">
+              <Button type="button" onClick={handleAddAmenity} variant="outline" className="border-green-200 text-green-600 hover:bg-green-50 hover:border-green-300">
                 <FaPlus className="w-4 h-4" />
               </Button>
             </div>
             <div className="flex flex-wrap gap-2">
               {formData.amenities?.map((amenity, index) => (
-                <Badge key={index} variant="outline" className="px-3 py-2 gap-2 bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 hover:border-blue-400 hover:text-blue-800 transition-all">
+                <Badge key={index} variant="outline" className="px-3 py-2 gap-2 bg-green-50 text-green-600 border-green-200 hover:bg-green-100 hover:border-green-400 hover:text-green-800 transition-all">
                   {amenity}
                   <span
                     className="cursor-pointer text-red-300 hover:text-red-600"
@@ -745,11 +1026,11 @@ export default function PropertyEditModal({ property, isOpen, onClose, onSave }:
           </div>
 
           {/* Form Actions */}
-          <div className="flex justify-end space-x-4 pt-6 border-t">
-            <Button type="button" variant="outline" onClick={onClose}>
+          <div className="flex justify-end space-x-4 pt-6 border-t border-slate-200">
+            <Button type="button" variant="outline" onClick={onClose} className="border-slate-300 text-slate-700 hover:bg-slate-50">
               Cancel
             </Button>
-            <Button type="submit" className="gradient-primary text-white">
+            <Button type="submit" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg">
               {property ? "Update Property" : "Create Property"}
             </Button>
           </div>

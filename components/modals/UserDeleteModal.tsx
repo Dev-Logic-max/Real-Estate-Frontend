@@ -2,7 +2,9 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+
 import { FaTrash, FaTimes, FaExclamationTriangle } from "react-icons/fa"
+
 import { User } from "@/types"
 
 interface UserDeleteModalProps {

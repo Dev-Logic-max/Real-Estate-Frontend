@@ -1,20 +1,24 @@
 "use client"
 
 import { useState, useEffect } from "react"
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+
 import { FiEye, FiMessageCircle, FiEdit3, FiTrash2, FiPlus, FiSearch, FiFilter } from "react-icons/fi"
-import { toast } from "react-toastify"
-import { propertyApi } from "@/lib/api/property"
-import { useAuth } from "@/hooks/useAuth"
+
 import PropertyViewModal from "@/components/modals/PropertyViewModal"
 import PropertyEditModal from "@/components/modals/PropertyEditModal"
 import PropertyDeleteModal from "@/components/modals/PropertyDeleteModal"
 import AddPropertyModal from "@/components/modals/NewPropertyModal"
-import { AddProperty, Property } from "@/types"
 import AutoImageSlider from "@/components/common/AutoImageSlider"
+
+import { propertyApi } from "@/lib/api/property"
+import { AddProperty, Property } from "@/types"
+import { useAuth } from "@/hooks/useAuth"
+import { toast } from "react-toastify"
 
 export default function UserPropertiesPage() {
     const [properties, setProperties] = useState<Property[]>([])
@@ -67,10 +71,10 @@ export default function UserPropertiesPage() {
         setDeleteModalOpen(true)
     }
 
-    const handleSaveProperty = async (updatedProperty: Partial<Property>) => {
+    const handleSaveProperty = async (updatedPropertyData: Partial<Property>) => {
         if (!selectedProperty) return
         try {
-            const response = await propertyApi.update(selectedProperty._id, updatedProperty)
+            const response = await propertyApi.update(selectedProperty._id, updatedPropertyData)
             setProperties(properties.map(p => p._id === selectedProperty._id ? { ...p, ...response.data.property } : p))
             toast.success("Property updated successfully")
             fetchUserProperties(user!.id)
@@ -94,10 +98,11 @@ export default function UserPropertiesPage() {
         }
     }
 
-    const handleAddProperty = async (newProperty: AddProperty) => {
+    const handleAddProperty = async (newPropertyData: AddProperty) => {
         try {
-            const response = await propertyApi.create(newProperty)
-            setProperties([...properties, response.data.property])
+            const response = await propertyApi.create(newPropertyData)
+            const newProperty = 'property' in response.data ? response.data.property : response.data;
+            setProperties([...properties, newProperty])
             toast.success("Property added successfully")
             fetchUserProperties(user!.id)
         } catch (error) {
@@ -105,6 +110,10 @@ export default function UserPropertiesPage() {
         } finally {
             setAddModalOpen(false)
         }
+    }
+    
+    const onAddProperty = () => {
+        fetchUserProperties(user!.id)
     }
 
     return (
@@ -244,7 +253,7 @@ export default function UserPropertiesPage() {
                 onConfirm={handleConfirmDelete}
             />
 
-            <AddPropertyModal isOpen={addModalOpen} onClose={() => setAddModalOpen(false)} onAdd={handleAddProperty} />
+            <AddPropertyModal isOpen={addModalOpen} onClose={() => setAddModalOpen(false)} onAddProperty={onAddProperty}/>
         </div>
     )
 }

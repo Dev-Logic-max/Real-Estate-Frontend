@@ -1,8 +1,8 @@
 import client from './axios';
-import { Property } from '@/types';
+import { AddProperty, Property } from '@/types';
 
 export const propertyApi = {
-    create: (data: Partial<Property>) => client.post<{ message: string; property: Property }>('/property', data),
+    create: (data: Partial<AddProperty>) => client.post<{ message: string; property: Property }>('/property', data),
     getById: (id: string) => client.get<{ property: Property }>(`/property/${id}`),
     update: (id: string, data: Partial<Property>) => client.patch(`/property/${id}`, data),
     delete: (id: string) => client.delete(`/property/${id}`),

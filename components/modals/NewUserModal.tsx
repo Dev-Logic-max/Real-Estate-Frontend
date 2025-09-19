@@ -2,19 +2,22 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
+
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
+
 import { FiX, FiUser, FiMail, FiPhone, FiMapPin, FiLock, FiUpload, FiInfo, FiDollarSign } from "react-icons/fi"
 import { PiUserCircleCheckDuotone } from "react-icons/pi";
+
 import { RoleEnum, StatusEnum, AddUser } from "@/types"
-import { toast } from "react-toastify"
-import { userApi } from "@/lib/api/user"
 import { CreateAgentDto } from "@/types/dto"
 import { agentApi } from "@/lib/api/agent"
-import { Badge } from "../ui/badge"
+import { userApi } from "@/lib/api/user"
+import { toast } from "react-toastify"
 
 interface AddUserModalProps {
   isOpen: boolean;
