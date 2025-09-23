@@ -1,22 +1,12 @@
 "use client"
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import {
-  FaHome,
-  FaBuilding,
-  FaBed,
-  FaBath,
-  FaRulerCombined,
-  FaMapMarkerAlt,
-  FaUser,
-  FaPhone,
-  FaEnvelope,
-  FaCar,
-  FaTimes,
-} from "react-icons/fa"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+
+import { FaHome, FaBuilding, FaBed, FaBath, FaRulerCombined, FaMapMarkerAlt, FaUser, FaPhone, FaEnvelope, FaCar, FaTimes } from "react-icons/fa"
+
 import AutoImageSlider from "@/components/common/AutoImageSlider"
 import { Property } from "@/types"
 

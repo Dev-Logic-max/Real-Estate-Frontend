@@ -1,12 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
+
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+
 import AutoImageSlider from "@/components/common/AutoImageSlider"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 // Modals
 import PropertyViewModal from "@/components/modals/PropertyViewModal"
@@ -22,8 +24,8 @@ import { AddProperty, Property } from "@/types"
 import { toast } from "react-toastify"
 import { FaSearch, FaPlus, FaEye, FaEdit, FaTrash, FaHome, FaBuilding, FaBed, FaBath, FaRulerCombined, FaMapMarkerAlt, FaUser, FaPhone, FaEnvelope } from "react-icons/fa"
 import { PiBathtub, PiBed, PiBuildingApartmentDuotone, PiBuildingDuotone, PiBuildingOfficeDuotone, PiBuildingsDuotone, PiEnvelope, PiEyeBold, PiHouseLineDuotone, PiMapPin, PiMapPinLine, PiPencilSimpleBold, PiPhoneCall, PiRuler, PiTrashBold, PiUserCircle } from "react-icons/pi"
-import { agentApi } from "@/lib/api/agent"
 import { FcApproval } from "react-icons/fc"
+import { agentApi } from "@/lib/api/agent"
 
 export default function PropertiesPage() {
     const [layout, setLayout] = useState("grid")
