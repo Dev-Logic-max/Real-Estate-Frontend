@@ -5,7 +5,11 @@ export const userApi = {
     create: (data: { email: string; password: string; firstName: string; lastName?: string; phone?: string }) =>
         client.post<{ message: string; user: User; id: string }>('/users/create', data),
     updateProfile: (data: Partial<User>) => client.patch('/users/update/profile', data),
+    deleteUser: (id: string) => client.delete(`/users/${id}`),
+
     usersList: () => client.get<{ users: User[] }>('/users'),
+    getUserById: (id: string) => client.get<{ user: User }>(`/users/${id}`),
+
     uploadProfile: (file: File) => {
         const formData = new FormData();
         formData.append("file", file);
@@ -13,9 +17,9 @@ export const userApi = {
             headers: { 'Content-Type': 'multipart/form-data' },
         });
     },
+
     updateEmail: (data: { email: string }) => client.patch('/users/email', data),
     updateById: (id: string, data: Partial<User>) => client.patch(`/users/${id}`, data),
     requestRole: (data: { role: number }) => client.post('/users/role-request', data), // Assume body { role: RoleEnum }
     upgradeRole: (id: string, data: { role: number; approve: boolean }) => client.patch(`/users/${id}/upgrade-role`, data),
-    deleteUser: (id: string) => client.delete(`/users/${id}`),
 };

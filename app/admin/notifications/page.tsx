@@ -1,47 +1,79 @@
 "use client"
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useEffect, useRef, useState } from "react"
+
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {
-  FiBell,
-  FiSearch,
-  FiEdit3,
-  FiTrash2,
-  FiPlus,
-  FiHome,
-  FiUsers,
-  FiUserCheck,
-  FiMail,
-  FiSmartphone,
-  FiMonitor,
-  FiCalendar,
-  FiEye,
-  FiChevronLeft,
-  FiChevronRight,
-} from "react-icons/fi"
-import notificationsData from "@/json/admin-notifications.json"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+
+import { FiBell, FiSearch, FiEdit3, FiTrash2, FiPlus, FiHome, FiUsers, FiUserCheck, FiMail, FiSmartphone, FiMonitor, FiCalendar, FiEye, FiChevronLeft, FiChevronRight } from "react-icons/fi"
+import { FcSynchronize } from "react-icons/fc"
+import { FaUser } from "react-icons/fa"
+
 import EditNotificationModal from "@/components/modals/NotificationEditModal"
+import { toast } from "react-toastify"
+
+import { notificationApi } from "@/lib/api/notification"
+import { Notification } from "@/types"
+import NotificationDeleteModal from "@/components/modals/NotificationDeleteModal"
 
 export default function AdminNotificationsPage() {
-  const [notifications, setNotifications] = useState(notificationsData)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [filterType, setFilterType] = useState("all")
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [filterStatus, setFilterStatus] = useState("all")
+  const [filterType, setFilterType] = useState("all")
+  const [searchTerm, setSearchTerm] = useState("")
+
+  const [selectedNotificationId, setSelectedNotificationId] = useState<string | null>(null)
   const [editingNotification, setEditingNotification] = useState(null)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+
+  const [loading, setLoading] = useState(true)
+  const syncRef = useRef<HTMLElement>(null);
+
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
+
+  const fetchNotifications = async () => {
+    try {
+      setLoading(true)
+      const response = await notificationApi.getAllNotifications({ page: currentPage, limit: itemsPerPage })
+      setNotifications(Array.isArray(response.data) ? response.data : [])
+      console.log("Notifications Response", response)
+      console.log("Notifications state", notifications)
+    } catch (error) {
+      toast.error("Failed to fetch notifications")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchNotifications()
+
+    if (syncRef.current) {
+      syncRef.current.addEventListener('animationend', () => {
+        syncRef.current!.style.transform = 'rotate(0deg)';
+      });
+    }
+
+    return () => {
+      if (syncRef.current) {
+        syncRef.current.removeEventListener("animationend", () => {
+          syncRef.current!.style.transform = "rotate(0deg)";
+        });
+      }
+    };
+  }, [currentPage])
 
   const filteredNotifications = notifications.filter((notification) => {
     const matchesSearch =
       notification.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      notification.userName.toLowerCase().includes(searchTerm.toLowerCase())
+      `${notification.firstName} ${notification.lastName}`.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = filterType === "all" || notification.type === filterType
     const matchesStatus =
       filterStatus === "all" ||
@@ -55,7 +87,7 @@ export default function AdminNotificationsPage() {
     switch (category) {
       case "property":
         return filteredNotifications.filter((n) =>
-          ["PROPERTY_CREATED", "PROPERTY_LISTED", "PROPERTY_SOLD"].includes(n.purpose),
+          ["property_created", "PROPERTY_LISTED", "PROPERTY_SOLD"].includes(n.purpose),
         )
       case "user":
         return filteredNotifications.filter((n) =>
@@ -70,7 +102,7 @@ export default function AdminNotificationsPage() {
 
   const getPurposeStyles = (purpose: string) => {
     switch (purpose) {
-      case "PROPERTY_CREATED":
+      case "property_created":
         return "bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-200"
       case "PROPERTY_LISTED":
         return "bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 border-blue-200"
@@ -112,16 +144,25 @@ export default function AdminNotificationsPage() {
     setEditingNotification(notification)
   }
 
-  const handleSaveNotification = (updatedNotification: any) => {
-    setNotifications((prev) => prev.map((n) => (n.id === updatedNotification.id ? updatedNotification : n)))
+  const handleDeleteNotification = async (id: string) => {
+    setSelectedNotificationId(id)
+    setDeleteModalOpen(true)
   }
 
-  const handleDeleteNotification = (id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id))
+  const handleSaveNotification = async (updatedNotification: Notification) => {
+    try {
+      await notificationApi.updateAllowedRoles(updatedNotification._id, { allowedRoles: updatedNotification.allowedRoles });
+      setNotifications((prev) =>
+        prev.map((n) => (n._id === updatedNotification._id ? updatedNotification : n))
+      );
+      toast.success("Notification updated successfully");
+    } catch (error) {
+      toast.error("Failed to update notification");
+    }
   }
 
   return (
-    <div className="p-6 space-y-6 bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen">
+    <div className="space-y-6 min-h-screen">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -156,7 +197,7 @@ export default function AdminNotificationsPage() {
                 <p className="text-2xl font-bold">
                   {
                     notifications.filter((n) =>
-                      ["PROPERTY_CREATED", "PROPERTY_LISTED", "PROPERTY_SOLD"].includes(n.purpose),
+                      ["property_created", "PROPERTY_LISTED", "PROPERTY_SOLD"].includes(n.purpose),
                     ).length
                   }
                 </p>
@@ -267,18 +308,37 @@ export default function AdminNotificationsPage() {
         </TabsList>
 
         <TabsContent value="all">
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-t-lg">
-              <CardTitle className="flex items-center">
+          <Card className="shadow-lg pt-0 gap-4 overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-blue-100 relative gap-0 pt-4">
+              <CardTitle className="flex items-center gradient-text text-blue-900">
                 <FiBell className="w-5 h-5 mr-2" />
                 All Notifications Management
+                <div
+                  ref={syncRef as any}
+                  className="w-6 h-6 absolute top-4 right-6 p-1 bg-blue-100 rounded-sm hover:scale-125 cursor-pointer"
+                  onClick={async () => {
+                    if (syncRef.current) {
+                      syncRef.current.style.transition = "transform 1s";
+                      syncRef.current.style.transform = "rotate(360deg)";
+                      await fetchNotifications();
+                      toast.success("Notifications refreshed successfully");
+                    }
+                  }}
+                >
+                  <FcSynchronize className="w-full h-full" />
+                </div>
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-0">
+            <CardContent className="p-0 m-4 rounded-md overflow-hidden">
               <Table>
-                <TableHeader>
-                  <TableRow className="border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50">
-                    <TableHead className="font-semibold text-blue-900">User</TableHead>
+                <TableHeader className="bg-gradient-to-r from-blue-100 to-purple-100">
+                  <TableRow className="border-blue-200">
+                    <TableHead className="font-semibold text-blue-900">
+                      <div className="flex items-center justify-center gap-2">
+                        <FaUser className="text-blue-600" />
+                        User
+                      </div>
+                    </TableHead>
                     <TableHead className="font-semibold text-blue-900">Message</TableHead>
                     <TableHead className="font-semibold text-blue-900">Type</TableHead>
                     <TableHead className="font-semibold text-blue-900">Purpose</TableHead>
@@ -291,75 +351,85 @@ export default function AdminNotificationsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedNotifications.map((notification) => (
-                    <TableRow key={notification.id} className="hover:bg-blue-50 transition-colors">
-                      <TableCell>
-                        <div className="flex items-center space-x-3">
-                          <Avatar className="w-10 h-10">
-                            <AvatarImage src={notification.userAvatar || "/placeholder.svg"} />
-                            <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-                              {notification.userName
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-semibold text-gray-900">{notification.userName}</p>
-                            <p className="text-sm text-gray-500">ID: {notification.userId}</p>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="max-w-xs">
-                        <p className="truncate text-gray-700">{notification.message}</p>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          {getTypeIcon(notification.type)}
-                          <span className="capitalize text-sm font-medium">{notification.type}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={`${getPurposeStyles(notification.purpose)} border font-medium`}>
-                          {notification.purpose
-                            .replace(/_/g, " ")
-                            .toLowerCase()
-                            .replace(/\b\w/g, (l) => l.toUpperCase())}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={notification.read ? "secondary" : "default"}
-                          className={notification.read ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
-                        >
-                          {notification.read ? "Read" : "Unread"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-sm text-gray-600">
-                        {new Date(notification.createdAt).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleEditNotification(notification)}
-                            className="hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600"
-                          >
-                            <FiEdit3 className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDeleteNotification(notification.id)}
-                            className="hover:bg-red-50 hover:border-red-300 hover:text-red-600"
-                          >
-                            <FiTrash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center text-gray-600">
+                        Loading notifications...
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : paginatedNotifications.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center text-gray-600">
+                        No notifications found
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    paginatedNotifications.map((notification) => (
+                      <TableRow key={notification._id} className="hover:bg-blue-50 transition-colors">
+                        <TableCell>
+                          <div className="flex items-center space-x-3">
+                            <Avatar className="w-10 h-10">
+                              <AvatarImage src={notification.profilePhotos?.[0] ? `${process.env.NEXT_PUBLIC_PICTURES_URL}${notification.profilePhotos[0]}` : "/placeholder.svg"} />
+                              <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+                                {`${notification.firstName?.[0] ?? ''}${notification.lastName?.[0] ?? ''}`.toUpperCase() || 'N/A'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-semibold text-gray-900">{`${notification.firstName} ${notification.lastName}`}</p>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="max-w-xs">
+                          <p className="truncate text-gray-700">{notification.message}</p>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center space-x-2">
+                            {getTypeIcon(notification.type)}
+                            <span className="capitalize text-sm font-medium">{notification.type}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={`${getPurposeStyles(notification.purpose)} border font-medium`}>
+                            {notification.purpose
+                              .replace(/_/g, " ")
+                              .toLowerCase()
+                              .replace(/\b\w/g, (l) => l.toUpperCase())}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={notification.read ? "secondary" : "default"}
+                            className={notification.read ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
+                          >
+                            {notification.read ? "Read" : "Unread"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-sm text-gray-600">
+                          {new Date(notification.createdAt).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEditNotification(notification)}
+                              className="hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600"
+                            >
+                              <FiEdit3 className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleDeleteNotification(notification._id)}
+                              className="hover:bg-red-50 hover:border-red-300 hover:text-red-600"
+                            >
+                              <FiTrash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
 
@@ -411,8 +481,8 @@ export default function AdminNotificationsPage() {
         </TabsContent>
 
         <TabsContent value="property">
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-t-lg">
+          <Card className="shadow-lg pt-0 gap-4">
+            <CardHeader className="bg-gradient-to-r from-green-400 to-emerald-500 text-white rounded-t-lg py-4">
               <CardTitle className="flex items-center">
                 <FiHome className="w-5 h-5 mr-2" />
                 Property Notifications
@@ -422,21 +492,18 @@ export default function AdminNotificationsPage() {
               <div className="space-y-4">
                 {getNotificationsByCategory("property").map((notification) => (
                   <div
-                    key={notification.id}
+                    key={notification._id}
                     className="flex items-start space-x-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200"
                   >
                     <Avatar className="w-12 h-12">
-                      <AvatarImage src={notification.userAvatar || "/placeholder.svg"} />
-                      <AvatarFallback className="bg-gradient-to-r from-green-500 to-emerald-500 text-white">
-                        {notification.userName
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
+                      <AvatarImage src={notification.profilePhotos?.[0] ? `${process.env.NEXT_PUBLIC_PICTURES_URL}${notification.profilePhotos[0]}` : "/placeholder.svg"} />
+                      <AvatarFallback className="bg-gradient-to-b from-green-500 to-emerald-500 text-white">
+                        {`${notification.firstName?.[0] ?? ''}${notification.lastName?.[0] ?? ''}`.toUpperCase() || 'N/A'}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <h4 className="font-semibold text-gray-900">{notification.userName}</h4>
+                        <h4 className="font-semibold text-gray-900">{`${notification.firstName} ${notification.lastName}`}</h4>
                         <div className="flex items-center space-x-2">
                           <Badge className={getPurposeStyles(notification.purpose)}>
                             {notification.purpose
@@ -459,7 +526,7 @@ export default function AdminNotificationsPage() {
                           <Button size="sm" variant="outline" className="hover:bg-green-100 bg-transparent">
                             <FiEdit3 className="w-4 h-4" />
                           </Button>
-                          <Button size="sm" variant="outline" className="hover:bg-red-100 bg-transparent">
+                          <Button size="sm" variant="outline" className="hover:bg-red-100 bg-transparent" onClick={() => handleDeleteNotification(notification._id)}>
                             <FiTrash2 className="w-4 h-4" />
                           </Button>
                         </div>
@@ -473,8 +540,8 @@ export default function AdminNotificationsPage() {
         </TabsContent>
 
         <TabsContent value="user">
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-purple-500 to-violet-600 text-white rounded-t-lg">
+          <Card className="shadow-lg pt-0 gap-4">
+            <CardHeader className="bg-gradient-to-r from-purple-400 to-violet-500 text-white rounded-t-lg py-4">
               <CardTitle className="flex items-center">
                 <FiUsers className="w-5 h-5 mr-2" />
                 User Notifications
@@ -484,21 +551,18 @@ export default function AdminNotificationsPage() {
               <div className="space-y-4">
                 {getNotificationsByCategory("user").map((notification) => (
                   <div
-                    key={notification.id}
+                    key={notification._id}
                     className="flex items-start space-x-4 p-4 bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg border border-purple-200"
                   >
                     <Avatar className="w-12 h-12">
-                      <AvatarImage src={notification.userAvatar || "/placeholder.svg"} />
-                      <AvatarFallback className="bg-gradient-to-r from-purple-500 to-violet-500 text-white">
-                        {notification.userName
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
+                      <AvatarImage src={notification.profilePhotos?.[0] ? `${process.env.NEXT_PUBLIC_PICTURES_URL}${notification.profilePhotos[0]}` : "/placeholder.svg"} />
+                      <AvatarFallback className="bg-gradient-to-b from-purple-500 to-violet-500 text-white">
+                        {`${notification.firstName?.[0] ?? ''}${notification.lastName?.[0] ?? ''}`.toUpperCase() || 'N/A'}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <h4 className="font-semibold text-gray-900">{notification.userName}</h4>
+                        <h4 className="font-semibold text-gray-900">{`${notification.firstName} ${notification.lastName}`}</h4>
                         <div className="flex items-center space-x-2">
                           <Badge className={getPurposeStyles(notification.purpose)}>
                             {notification.purpose
@@ -535,8 +599,8 @@ export default function AdminNotificationsPage() {
         </TabsContent>
 
         <TabsContent value="deals">
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-t-lg">
+          <Card className="shadow-lg pt-0 gap-4">
+            <CardHeader className="bg-gradient-to-r from-orange-400 to-amber-500 text-white rounded-t-lg py-4">
               <CardTitle className="flex items-center">
                 <FiUserCheck className="w-5 h-5 mr-2" />
                 Deal Notifications
@@ -546,21 +610,18 @@ export default function AdminNotificationsPage() {
               <div className="space-y-4">
                 {getNotificationsByCategory("deals").map((notification) => (
                   <div
-                    key={notification.id}
+                    key={notification._id}
                     className="flex items-start space-x-4 p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg border border-orange-200"
                   >
                     <Avatar className="w-12 h-12">
-                      <AvatarImage src={notification.userAvatar || "/placeholder.svg"} />
+                      <AvatarImage src={notification.profilePhotos?.[0] ? `${process.env.NEXT_PUBLIC_PICTURES_URL}${notification.profilePhotos[0]}` : "/placeholder.svg"} />
                       <AvatarFallback className="bg-gradient-to-r from-orange-500 to-amber-500 text-white">
-                        {notification.userName
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
+                        {`${notification.firstName?.[0] ?? ''}${notification.lastName?.[0] ?? ''}`.toUpperCase() || 'N/A'}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <h4 className="font-semibold text-gray-900">{notification.userName}</h4>
+                        <h4 className="font-semibold text-gray-900">{`${notification.firstName} ${notification.lastName}`}</h4>
                         <div className="flex items-center space-x-2">
                           <Badge className={getPurposeStyles(notification.purpose)}>
                             {notification.purpose
@@ -602,6 +663,16 @@ export default function AdminNotificationsPage() {
         onClose={() => setEditingNotification(null)}
         notification={editingNotification}
         onSave={handleSaveNotification}
+      />
+
+      <NotificationDeleteModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        notificationId={selectedNotificationId || ""}
+        onDelete={() => {
+          setNotifications((prev) => prev.filter((n) => n._id !== selectedNotificationId))
+          setSelectedNotificationId(null)
+        }}
       />
     </div>
   )
