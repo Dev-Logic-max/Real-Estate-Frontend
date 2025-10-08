@@ -1,38 +1,26 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {
-    FaEye,
-    FaEdit,
-    FaTrash,
-    FaPlus,
-    FaSearch,
-    FaUser,
-    FaEnvelope,
-    FaUserTag,
-    FaCalendarAlt,
-    FaUsers,
-    FaToggleOn,
-    FaCog,
-    FaChevronLeft,
-    FaChevronRight,
-    FaClock,
-} from "react-icons/fa"
+
+import { FaEye, FaEdit, FaTrash, FaPlus, FaSearch, FaUser, FaEnvelope, FaUserTag, FaUsers, FaToggleOn, FaCog, FaChevronLeft, FaChevronRight } from "react-icons/fa"
+import { FcCalendar, FcClock, FcSynchronize } from "react-icons/fc";
+import { MdArrowDropDown } from "react-icons/md"
+
 import UserViewModal from "@/components/modals/UserViewModal"
 import UserEditModal from "@/components/modals/UserEditModal"
 import UserDeleteModal from "@/components/modals/UserDeleteModal"
 import AddUserModal from "@/components/modals/NewUserModal"
+
 import { AddUser, RoleEnum, User } from "@/types"
 import { userApi } from "@/lib/api/user"
 import { toast } from "react-toastify"
-import { MdArrowDropDown } from "react-icons/md"
-import { FcCalendar, FcClock, FcPlanner, FcSynchronize } from "react-icons/fc";
 
 export default function UsersPage() {
     const [searchTerm, setSearchTerm] = useState("")
@@ -91,9 +79,9 @@ export default function UsersPage() {
             case "admin":
                 return "bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg hover:from-purple-600 hover:to-pink-600"
             case "agent":
-                return "bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg hover:from-blue-600 hover:to-cyan-600"
-            case "seller":
                 return "bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg hover:from-purple-600 hover:to-blue-600"
+            case "seller":
+                return "bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg hover:from-blue-600 hover:to-cyan-600"
             case "buyer":
                 return "bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg hover:from-orange-600 hover:to-pink-600"
             case "investor":
@@ -231,8 +219,6 @@ export default function UsersPage() {
                                 <SelectItem value="all">All Roles</SelectItem>
                                 <SelectItem value="admin" className="hover:bg-blue-100">Admin</SelectItem>
                                 <SelectItem value="agent" className="hover:bg-blue-100">Agent</SelectItem>
-                                <SelectItem value="seller" className="hover:bg-blue-100">Seller</SelectItem>
-                                <SelectItem value="buyer" className="hover:bg-blue-100">Buyer</SelectItem>
                                 <SelectItem value="user" className="hover:bg-blue-100">User</SelectItem>
                             </SelectContent>
                         </Select>
