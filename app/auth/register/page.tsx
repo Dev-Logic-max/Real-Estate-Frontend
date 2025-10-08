@@ -50,7 +50,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="max-h-screen flex">
       {/* Left side - Image slider */}
       <div className="hidden lg:flex lg:w-1/2 relative">
         <AutoImageSlider images={propertyImages} className="w-full h-full" objectFit="cover" />
@@ -72,8 +72,8 @@ export default function RegisterPage() {
       </div>
 
       {/* Right side - Register form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-green-50 via-blue-50 to-purple-50">
-        <div className="w-full max-w-md">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 overflow-auto">
+        <div className="w-full h-full max-w-md">
           {/* Header */}
           <div className="text-center mb-8">
             <div className="lg:hidden flex items-center justify-center mb-6">
@@ -178,7 +178,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="flex items-center space-x-2">
-              <Checkbox id="terms" />
+              <Checkbox id="terms" className="cursor-pointer"/>
               <Label htmlFor="terms" className="text-sm text-gray-600">
                 I agree to the{" "}
                 <Link href="/terms" className="text-green-600 hover:text-green-700 transition-colors">
@@ -191,7 +191,7 @@ export default function RegisterPage() {
               </Label>
             </div>
 
-            <Button type="submit" disabled={loading} className="w-full h-12 gradient-success text-white hover:opacity-90 transition-all duration-300 shadow-gradient">
+            <Button type="submit" disabled={loading} className="w-full h-12 gradient-success text-white hover:opacity-90 transition-all duration-300 shadow-gradient cursor-pointer">
               {loading ? "Creating Account..." : "Create Account"}
             </Button>
 
@@ -203,21 +203,21 @@ export default function RegisterPage() {
             <div className="space-y-3">
               <Button
                 variant="outline"
-                className="w-full h-12 border-2 border-gray-200 hover:bg-red-50 hover:border-red-200 transition-all duration-300 bg-transparent"
+                className="w-full h-12 border-2 border-gray-200 hover:bg-red-50 hover:border-red-200 transition-all duration-300 bg-transparent cursor-pointer"
               >
                 <FaGoogle className="mr-2 text-red-500" />
                 Sign up with Google
               </Button>
               <Button
                 variant="outline"
-                className="w-full h-12 border-2 border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 bg-transparent"
+                className="w-full h-12 border-2 border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 bg-transparent cursor-pointer"
               >
                 <FaApple className="mr-2 text-gray-800" />
                 Sign up with Apple
               </Button>
             </div>
 
-            <div className="text-center">
+            <div className="text-center pb-12">
               <span className="text-gray-600">Already have an account? </span>
               <Link href="/auth/login" className="text-green-600 hover:text-green-700 font-medium transition-colors">
                 Sign In

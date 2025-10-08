@@ -9,6 +9,8 @@ import { FaHome, FaBuilding, FaBed, FaBath, FaRulerCombined, FaMapMarkerAlt, FaU
 
 import AutoImageSlider from "@/components/common/AutoImageSlider"
 import { Property } from "@/types"
+import { FaX } from "react-icons/fa6"
+import { PiPhoneDuotone } from "react-icons/pi"
 
 interface PropertyViewModalProps {
   property: Property | null
@@ -38,13 +40,13 @@ export default function PropertyViewModal({ property, isOpen, onClose }: Propert
     switch (propertyType) {
       case "villa":
       case "house":
-        return <FaHome className="text-blue-500" />
+        return <FaHome className="h-6 w-6 text-blue-500" />
       case "apartment":
-        return <FaBuilding className="text-green-500" />
+        return <FaBuilding className="h-6 w-6 text-green-500" />
       case "office":
-        return <FaBuilding className="text-purple-500" />
+        return <FaBuilding className="h-6 w-6 text-purple-500" />
       default:
-        return <FaHome className="text-gray-500" />
+        return <FaHome className="h-6 w-6 text-gray-500" />
     }
   }
 
@@ -57,16 +59,16 @@ export default function PropertyViewModal({ property, isOpen, onClose }: Propert
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="min-w-4xl max-h-[90vh] overflow-y-auto bg-white">
-        <DialogHeader className="flex flex-row items-center justify-between">
+      <DialogContent className="min-w-4xl max-h-[90vh] overflow-y-auto bg-white shadow-xl">
+        <DialogHeader className="flex flex-row items-center justify-between border-b pb-2">
           <DialogTitle className="text-2xl font-bold gradient-text-primary">Property Details</DialogTitle>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <FaTimes className="w-4 h-4" />
+          <Button variant="ghost" size="sm" onClick={onClose} className="cursor-pointer hover:bg-red-100">
+            <FaX />
           </Button>
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Image Slider */}
+          {/* 🖼️ Image Slider */}
           <div className="relative">
             <AutoImageSlider
               images={
@@ -80,100 +82,102 @@ export default function PropertyViewModal({ property, isOpen, onClose }: Propert
               interval={5000}
             />
             <div className="absolute top-4 left-4 flex gap-2">
-              <Badge className={getStatusColor(property.status)}>{property.status}</Badge>
+              <Badge className={`capitalize ${getStatusColor(property.status)}`}>{property.status}</Badge>
               <Badge variant="outline" className="bg-white/90 backdrop-blur-sm capitalize">
                 {property.type}
               </Badge>
             </div>
           </div>
 
-          {/* Basic Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6">
+            {/* 🏠 Overview Basic Info */}
             <div className="space-y-4">
               <div className="flex items-start justify-between">
-                <h3 className="text-xl font-semibold text-gray-900">{property.title}</h3>
-                {getTypeIcon(property.propertyType || '')}
+                <h3 className="text-3xl font-semibold text-gray-800">{property.title}</h3>
+                <span className="my-auto">{getTypeIcon(property.propertyType || '')}</span>
               </div>
               <div className="text-3xl font-bold text-green-600">{formatPrice(property.price, property.type)}</div>
 
               {property.description && (
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Description</h4>
+                <div className="border rounded-lg p-2 bg-gray-50">
+                  <h4 className="text-lg text-shadow-sm font-medium text-gray-900 mb-2">Description</h4>
                   <p className="text-gray-600">{property.description}</p>
                 </div>
               )}
             </div>
 
-            <div className="space-y-4">
-              {/* Property Features */}
-              <div className="grid grid-cols-2 gap-4">
-                {property.bedrooms && (
-                  <div className="flex items-center space-x-2 p-3 bg-blue-50 rounded-lg">
-                    <FaBed className="text-blue-500" />
-                    <div>
-                      <p className="text-sm text-gray-600">Bedrooms</p>
-                      <p className="font-semibold">{property.bedrooms}</p>
-                    </div>
+            {/* 🛏️ Property Features */}
+            <div className="grid grid-cols-4 gap-4">
+              {property.bedrooms && (
+                <div className="flex items-center space-x-2 p-3 bg-blue-50 rounded-lg">
+                  <FaBed className="text-blue-500" />
+                  <div>
+                    <p className="text-sm text-gray-600">Bedrooms</p>
+                    <p className="font-semibold">{property.bedrooms}</p>
                   </div>
-                )}
-                {property.bathrooms && (
-                  <div className="flex items-center space-x-2 p-3 bg-green-50 rounded-lg">
-                    <FaBath className="text-green-500" />
-                    <div>
-                      <p className="text-sm text-gray-600">Bathrooms</p>
-                      <p className="font-semibold">{property.bathrooms}</p>
-                    </div>
+                </div>
+              )}
+              {property.bathrooms && (
+                <div className="flex items-center space-x-2 p-3 bg-green-50 rounded-lg">
+                  <FaBath className="text-green-500" />
+                  <div>
+                    <p className="text-sm text-gray-600">Bathrooms</p>
+                    <p className="font-semibold">{property.bathrooms}</p>
                   </div>
-                )}
-                {property.area && (
-                  <div className="flex items-center space-x-2 p-3 bg-purple-50 rounded-lg">
-                    <FaRulerCombined className="text-purple-500" />
-                    <div>
-                      <p className="text-sm text-gray-600">Area</p>
-                      <p className="font-semibold">{property.area} sq ft</p>
-                    </div>
+                </div>
+              )}
+              {property.area && (
+                <div className="flex items-center space-x-2 p-3 bg-purple-50 rounded-lg">
+                  <FaRulerCombined className="text-purple-500" />
+                  <div>
+                    <p className="text-sm text-gray-600">Area</p>
+                    <p className="font-semibold">{property.area} sq ft</p>
                   </div>
-                )}
-                {property.parkingSpaces && (
-                  <div className="flex items-center space-x-2 p-3 bg-orange-50 rounded-lg">
-                    <FaCar className="text-orange-500" />
-                    <div>
-                      <p className="text-sm text-gray-600">Parking</p>
-                      <p className="font-semibold">{property.parkingSpaces} spaces</p>
-                    </div>
+                </div>
+              )}
+              {property.parkingSpaces && (
+                <div className="flex items-center space-x-2 p-3 bg-orange-50 rounded-lg">
+                  <FaCar className="text-orange-500" />
+                  <div>
+                    <p className="text-sm text-gray-600">Parking</p>
+                    <p className="font-semibold">{property.parkingSpaces} spaces</p>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
 
           <Separator />
 
-          {/* Location */}
-          <div className="space-y-3">
-            <h4 className="font-medium text-gray-900 flex items-center gap-2">
+          {/* 📍 Location */}
+          <div className="border py-2 px-3 rounded-lg space-y-3 bg-gray-50">
+            <h4 className="font-medium text-shadow-sm text-lg text-gray-900 flex items-center gap-2">
               <FaMapMarkerAlt className="text-red-500" />
               Location
             </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div className="flex justify gap-12 text-sm">
               <div>
-                <p className="text-gray-600">Address</p>
+                <p className="text-shadow-sm text-gray-600">Address</p>
                 <p className="font-medium">{property.address || "Not specified"}</p>
               </div>
               <div>
-                <p className="text-gray-600">City, State</p>
+                <p className="text-shadow-sm text-gray-600">City, State</p>
                 <p className="font-medium">
                   {property.city}, {property.state}
                 </p>
               </div>
+              <div>
+                <p className="text-shadow-sm text-gray-600">Country</p>
+                <p className="font-medium">{property.country}</p>
+              </div>
             </div>
           </div>
 
           <Separator />
 
-          {/* Additional Details */}
+          {/* 🧾 Details Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
+            <div className="space-y-4 border px-4 py-2 rounded-lg">
               <h4 className="font-medium text-gray-900">Property Details</h4>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
@@ -188,12 +192,6 @@ export default function PropertyViewModal({ property, isOpen, onClose }: Propert
                   <span className="text-gray-600">Furnished:</span>
                   <span className="font-medium">{property.isFurnished ? "Yes" : "No"}</span>
                 </div>
-                {property.floorNumber && (
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Floor:</span>
-                    <span className="font-medium">{property.floorNumber}</span>
-                  </div>
-                )}
                 {property.heatingSystem && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Heating:</span>
@@ -209,7 +207,7 @@ export default function PropertyViewModal({ property, isOpen, onClose }: Propert
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 border px-4 py-2 rounded-lg">
               <h4 className="font-medium text-gray-900">Contact Information</h4>
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
@@ -237,44 +235,61 @@ export default function PropertyViewModal({ property, isOpen, onClose }: Propert
             </div>
           </div>
 
-          {/* Amenities */}
+          <Separator />
+
+          {/* 🌿 Amenities */}
           {property.amenities && property.amenities.length > 0 && (
-            <>
-              <Separator />
-              <div className="space-y-3">
-                <h4 className="font-medium text-gray-900">Amenities</h4>
-                <div className="flex flex-wrap gap-2">
-                  {property.amenities.map((amenity, index) => (
-                    <Badge key={index} variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                      {amenity}
-                    </Badge>
-                  ))}
-                </div>
+            <div className="space-y-3">
+              <h4 className="font-medium text-shadow-sm text-gray-900">Amenities</h4>
+              <div className="flex flex-wrap gap-2">
+                {property.amenities.map((amenity, index) => (
+                  <Badge key={index} variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                    {amenity}
+                  </Badge>
+                ))}
               </div>
-            </>
+            </div>
           )}
 
-          {/* Agents */}
+          <Separator />
+
+          {/* 🧑‍💼  Agents */}
           {property.agents && property.agents.length > 0 && (
-            <>
-              <Separator />
+            <div className="space-y-3">
+              <h4 className="font-medium text-gray-900 text-shadow-md">Assigned Agents</h4>
               <div className="space-y-3">
-                <h4 className="font-medium text-gray-900">Assigned Agents</h4>
-                <div className="space-y-3">
-                  {property.agents.map((agent, index) => (
-                    <div key={index} className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          {/* <p className="font-medium">{agent.name}</p> */}
-                          <p className="text-sm text-gray-600">{agent.commissionRate}% commission</p>
+                {property.agents.map((agent, index) => (
+                  <div key={index} className="flex justify-between gap-4 px-4 py-2 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border">
+                    <div className="flex items-center gap-4">
+                      {agent.profilePhotos?.[0] ? (
+                        <img
+                          src={`${process.env.NEXT_PUBLIC_PICTURES_URL}${agent.profilePhotos?.[0]}`}
+                          className="w-10 h-10 rounded-full object-cover border border-blue-400"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium border border-blue-400 text-gray-600 bg-gradient-to-b from-purple-200 to-blue-400">
+                          {`${agent.firstName?.[0]}${agent.lastName?.[0]}`.toUpperCase() || 'N/A'}
                         </div>
-                        <Badge className={getStatusColor(agent.status)}>{agent.status}</Badge>
+                      )}
+                      <div>
+                        <div className="flex gap-4">
+                          <p className="text-lg font-medium text-blue-900 text-shadow-md">{agent.firstName} {agent.lastName}</p>
+                          <div><Badge className={`capitalize ${getStatusColor(agent.status)}`}>{agent.status}</Badge></div>
+                        </div>
+                        <p className="text-sm text-green-600 text-shadow-md">
+                          <span className="text-lg font-semibold text-gray-600">{agent.commissionRate}</span> % Commission
+                        </p>
                       </div>
                     </div>
-                  ))}
-                </div>
+                    <div className="ms-auto my-auto">
+                      <Button className="cursor-pointer rounded-xl border border-green-400 bg-green-50">
+                        <PiPhoneDuotone /> Contact
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </>
+            </div>
           )}
         </div>
       </DialogContent>

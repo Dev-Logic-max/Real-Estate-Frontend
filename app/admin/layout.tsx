@@ -2,20 +2,13 @@
 
 import type React from "react"
 
-import { useState } from "react"
 import AdminSidebar from "@/components/admin/AdminSidebar"
-import AdminHeader from "@/components/admin/AdminHeader"
+import Header from "@/components/layout/Header"
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const [isHeaderVisible, setIsHeaderVisible] = useState(true)
-
-  const toggleHeader = () => {
-    setIsHeaderVisible(!isHeaderVisible)
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdminHeader isHeaderVisible={isHeaderVisible} toggleHeader={toggleHeader} />
+      <Header />
 
       <div className="flex">
         <AdminSidebar />

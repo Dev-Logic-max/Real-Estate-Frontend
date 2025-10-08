@@ -13,12 +13,12 @@ export default function LandingLayout({ children }: Readonly<{ children: React.R
     const pathname = usePathname();
     return (
         <AuthProvider>
-            {!pathname?.startsWith("/admin") && <Header />}
+            {!pathname?.startsWith("/admin") && !pathname?.startsWith("/auth") && <Header />}
             <main>
                 {children}
                 <ToastContainer />
             </main>
-            {!pathname?.startsWith("/admin") && <Footer />}
+            {!pathname?.startsWith("/admin") && !pathname?.startsWith("/auth") && !pathname?.startsWith("/properties") && <Footer />}
         </AuthProvider>
     );
 }

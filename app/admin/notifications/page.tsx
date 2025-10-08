@@ -29,6 +29,7 @@ export default function AdminNotificationsPage() {
   const [searchTerm, setSearchTerm] = useState("")
 
   const [selectedNotificationId, setSelectedNotificationId] = useState<string | null>(null)
+  const [selectedNotifications, setSelectedNotifications] = useState<string[]>([]);
   const [editingNotification, setEditingNotification] = useState(null)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
 
@@ -43,6 +44,7 @@ export default function AdminNotificationsPage() {
       setLoading(true)
       const response = await notificationApi.getAllNotifications({ page: currentPage, limit: itemsPerPage })
       setNotifications(Array.isArray(response.data) ? response.data : [])
+      setSelectedNotifications([])
       console.log("Notifications Response", response)
       console.log("Notifications state", notifications)
     } catch (error) {
@@ -87,7 +89,7 @@ export default function AdminNotificationsPage() {
     switch (category) {
       case "property":
         return filteredNotifications.filter((n) =>
-          ["property_created", "PROPERTY_LISTED", "PROPERTY_SOLD"].includes(n.purpose),
+          ["property_created", "PROPERTY_LISTED", "PROPERTY_SOLD", "property_deleted"].includes(n.purpose),
         )
       case "user":
         return filteredNotifications.filter((n) =>
@@ -108,6 +110,8 @@ export default function AdminNotificationsPage() {
         return "bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-800 border-blue-200"
       case "PROPERTY_SOLD":
         return "bg-gradient-to-r from-purple-100 to-violet-100 text-purple-800 border-purple-200"
+      case "property_deleted":
+        return "bg-gradient-to-r from-red-100 to-red-100 text-red-800 border-pink-200"
       case "AGENT_APPROVED":
         return "bg-gradient-to-r from-green-100 to-teal-100 text-green-800 border-green-200"
       case "AGENT_REJECTED":
@@ -310,6 +314,27 @@ export default function AdminNotificationsPage() {
         <TabsContent value="all">
           <Card className="shadow-lg pt-0 gap-4 overflow-hidden">
             <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b border-blue-100 relative gap-0 pt-4">
+              {selectedNotifications.length > 0 && (
+                <Button
+                  className="absolute bg-red-400 hover:bg-red-600 left-72 top-2 cursor-pointer text-white"
+                  onClick={async () => {
+                    if (selectedNotifications.length > 0) {
+                      try {
+                        await Promise.all(selectedNotifications.map(id => notificationApi.deleteNotification(id)));
+                        setNotifications(prev => prev.filter(n => !selectedNotifications.includes(n._id)));
+                        setSelectedNotifications([]);
+                        toast.success("Selected notifications deleted successfully");
+                      } catch (error) {
+                        toast.error("Failed to delete selected notifications");
+                      }
+                    }
+                  }}
+                  disabled={selectedNotifications.length === 0}
+                >
+                  <FiTrash2 className="w-4 h-4" />
+                  Delete ( {selectedNotifications.length} )
+                </Button>
+              )}
               <CardTitle className="flex items-center gradient-text text-blue-900">
                 <FiBell className="w-5 h-5 mr-2" />
                 All Notifications Management
@@ -347,7 +372,21 @@ export default function AdminNotificationsPage() {
                       <FiCalendar className="w-4 h-4 inline mr-1" />
                       Date
                     </TableHead>
-                    <TableHead className="font-semibold text-blue-900">Actions</TableHead>
+                    <TableHead className="font-semibold text-blue-900 w-0 text-center">Actions</TableHead>
+                    <TableHead className="font-semibold text-blue-900">
+                      <input
+                        type="checkbox"
+                        checked={selectedNotifications.length === paginatedNotifications.length && paginatedNotifications.length > 0}
+                        className="size-4 cursor-pointer me-2"
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedNotifications(paginatedNotifications.map(n => n._id));
+                          } else {
+                            setSelectedNotifications([]);
+                          }
+                        }}
+                      />
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -399,7 +438,7 @@ export default function AdminNotificationsPage() {
                         <TableCell>
                           <Badge
                             variant={notification.read ? "secondary" : "default"}
-                            className={notification.read ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
+                            className={notification.read ? "bg-emerald-100 text-green-800" : "bg-orange-100 text-red-800"}
                           >
                             {notification.read ? "Read" : "Unread"}
                           </Badge>
@@ -408,7 +447,7 @@ export default function AdminNotificationsPage() {
                           {new Date(notification.createdAt).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center gap-2">
                             <Button
                               size="sm"
                               variant="outline"
@@ -426,6 +465,20 @@ export default function AdminNotificationsPage() {
                               <FiTrash2 className="w-4 h-4" />
                             </Button>
                           </div>
+                        </TableCell>
+                        <TableCell>
+                          <input
+                            type="checkbox"
+                            checked={selectedNotifications.includes(notification._id)}
+                            className="size-4 cursor-pointer"
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedNotifications([...selectedNotifications, notification._id]);
+                              } else {
+                                setSelectedNotifications(selectedNotifications.filter(id => id !== notification._id));
+                              }
+                            }}
+                          />
                         </TableCell>
                       </TableRow>
                     ))
